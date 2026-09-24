@@ -1,6 +1,6 @@
 {
  "date": "2026-09-24",
- "generated_at": "2026-09-24T19:07:09.958498+00:00",
+ "generated_at": "2026-09-24T19:09:10.735006+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -14,7 +14,7 @@
    "solver": {
     "key": "IQNESATORJZPDHBGWYUVCMLFXK",
     "score": -1380.78,
-    "ms": 1211.2,
+    "ms": 1105.5,
     "restarts": 192,
     "steps": 6000
    },
@@ -40,7 +40,7 @@
    "solver": {
     "key": "VTGWMDHAYELOSZPQXJCUBNRFKI",
     "score": -1877.526,
-    "ms": 1202.0,
+    "ms": 1086.5,
     "restarts": 192,
     "steps": 6000
    },
@@ -66,7 +66,7 @@
    "solver": {
     "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
     "score": -1884.867,
-    "ms": 1827.8,
+    "ms": 1634.9,
     "restarts": 192,
     "steps": 6000
    },
@@ -92,7 +92,7 @@
    "solver": {
     "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
     "score": -1951.419,
-    "ms": 1761.5,
+    "ms": 1608.4,
     "restarts": 192,
     "steps": 6000
    },
@@ -118,7 +118,7 @@
    "solver": {
     "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
     "score": -1885.961,
-    "ms": 1548.2,
+    "ms": 1410.4,
     "restarts": 192,
     "steps": 6000
    },
