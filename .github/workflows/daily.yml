@@ -48,3 +48,5 @@ jobs:
           git add pipeline/results/ || true
           git diff --cached --quiet || git commit -m "daily answers $(date -u +%F)"
           git push
+
+# nudge: reindex workflows
