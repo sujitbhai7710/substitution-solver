@@ -1,0 +1,65 @@
+wordlist.tsv — general English word frequencies for substitution-cipher solver scoring
+================================================================================
+
+Generated: 2026-09-23
+Location: /home/hatch/workspace/substitution-solver/data/wordlist.tsv
+
+FORMAT: one word per line: WORD<TAB>FREQ
+  WORD: uppercase ASCII A-Z with internal apostrophes allowed (e.g. DON'T)
+  FREQ: integer count
+  Sorted by FREQ descending. No duplicates.
+
+COUNTS
+  Total entries: 333,237
+  From primary source: 333,189
+  Appended contractions: 48 (44 required + 4 extra)
+  File size: ~4.95 MB
+
+PRIMARY SOURCE
+  Peter Norvig's count_1w.txt (Google Books Ngram unigrams)
+  Downloaded 2026-09-23 from https://norvig.com/ngrams/count_1w.txt
+  Raw: 333,333 lines, ~588.1B total tokens
+  Chosen over the `wordfreq` Python package's top list because Norvig gives
+  real corpus counts (not modeled probabilities) at ~333k vocabulary depth,
+  which is ideal for word-pattern dictionary attacks and candidate scoring.
+
+FILTERING APPLIED (to primary source)
+  - Uppercased all tokens; normalized curly apostrophes to ASCII '
+  - Stripped leading/trailing apostrophes
+  - Dropped tokens with digits in the word part (none found)
+  - Dropped single letters except A and I (both kept, with very high real counts)
+  - Dropped words longer than 24 characters (120 dropped)
+  - Kept only tokens matching ^[A-Z']+$ (source was already clean; no other
+    non-English garbage heuristics needed)
+  - Duplicates merged by summing counts (none existed after uppercasing)
+
+APPENDED CONTRACTIONS (marked — NOT from Norvig; Norvig's list has zero apostrophe tokens)
+  All 44 required contractions were absent from the primary source, so all 44
+  were appended, plus 4 extra high-frequency contractions (AIN'T, O'CLOCK,
+  Y'ALL, MA'AM) useful for puzzle solving.
+  Estimated frequency method: FREQ_est = round(588124220187 * 10^(zipf-9)),
+  where 588124220187 is the total token count of count_1w.txt and zipf is the
+  wordfreq package's zipf_frequency(word, 'en') (log10 occurrences per billion).
+  This anchors the estimates in the same count scale as the primary source.
+  Ranges: IT'S ~1.26B down to MUSTN'T ~426k — sensible vs. mid-frequency words.
+
+  Required appended (44): DON'T CAN'T WON'T IT'S I'M YOU'RE WE'RE THEY'RE
+  DIDN'T DOESN'T ISN'T AREN'T WASN'T WEREN'T HAVEN'T HASN'T HADN'T COULDN'T
+  WOULDN'T SHOULDN'T MUSTN'T LET'S THAT'S THERE'S WHAT'S WHO'S HE'S SHE'S
+  I'VE YOU'VE WE'VE THEY'VE I'LL YOU'LL HE'LL SHE'LL WE'LL THEY'LL I'D YOU'D
+  HE'D SHE'D WE'D THEY'D
+  Extra appended (4): AIN'T O'CLOCK Y'ALL MA'AM
+
+VERIFICATION (2026-09-23, Python script)
+  (1) Line count: 333,237 (>= 100,000 target: PASS)
+  (2) All 44 required contractions present: PASS (44/44)
+  (3) Spot frequencies — THE 23135851162 > OF 13151942776 > AND 12997637966 >
+      TO 12136980858 > BULL 10231851 > ELEPHANT 6116985: PASS (sensible order)
+  (4) Zero lowercase tokens, zero digit tokens, zero non-[A-Z'] tokens: PASS
+      Duplicates: 0. Sorted strictly descending by FREQ: PASS.
+      Only single letters kept: A, I.
+
+NOTES
+  - General English vocabulary only. No puzzle answers or puzzle-specific words.
+  - Contraction estimates are approximate (modern mixed-corpus model vs. Google
+    Books counts); they are ranked sensibly but marked here as appended.

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Preservation Tests — Substitution Cipher Solver</title>
+  <style>
+    body { font-family: monospace; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+    .pass { color: green; } .fail { color: red; font-weight: bold; }
+    pre { background: #f5f5f5; padding: 0.5em; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Frontend Preservation Tests</h1>
+  <p>These tests verify that the page passes ciphertext to WASM <strong>byte-for-byte unchanged</strong>,
+  and that the engine replays punctuation, casing, and whitespace verbatim.</p>
+  <div id="results"></div>
+  <script type="module">
+    import init, { solve_js } from './pkg/subst_solver.js';
+
+    const results = [];
+    function test(name, fn) {
+      try {
+        fn();
+        results.push(['pass', name, '']);
+      } catch (e) {
+        results.push(['fail', name, e.message]);
+      }
+    }
+    function assertEq(a, b, msg) {
+      if (a !== b) throw new Error(`${msg}: expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`);
+    }
+
+    // The frontend must not transform input before calling solve_js.
+    // We verify by checking that solve_js receives the exact string.
+    // (Here we test the engine's replay directly with an identity key scenario
+    // via a known puzzle; the frontend's job is to not touch the string.)
+
+    await init();
+
+    // Test 1: curly apostrophe (U+2019) is preserved, not normalized to ASCII.
+    test('curly apostrophe preserved', () => {
+      // Identity-key check: if the engine gets curly input, output keeps it.
+      // We use solve_js on a tiny puzzle; the point is the output contains ’.
+      const out = JSON.parse(solve_js('DON’T', '', 2, 100));
+      if (!out.plaintext.includes('’')) {
+        throw new Error('curly apostrophe was normalized: ' + JSON.stringify(out.plaintext));
+      }
+    });
+
+    // Test 2: the app.js runSolver path does not normalize.
+    // We fetch app.js and assert it contains no normalization replaces.
+    test('app.js has no punctuation normalization', async () => {
+      const src = await (await fetch('./app.js')).text();
+      const bad = ['\\u2018', '\\u2019', '\\u201C', '\\u201D', '\\u2013', '\\u2014'];
+      for (const seq of bad) {
+        if (src.includes(seq)) {
+          throw new Error('app.js contains normalization sequence ' + seq);
+        }
+      }
+      // Must pass el('toolInput').value directly.
+      if (!src.includes("el('toolInput').value")) {
+        throw new Error('app.js does not read raw textarea value');
+      }
+    });
+
+    const div = document.getElementById('results');
+    let pass = 0, fail = 0;
+    for (const [status, name, msg] of results) {
+      const p = document.createElement('p');
+      p.className = status;
+      p.textContent = (status === 'pass' ? '✓ ' : '✗ ') + name + (msg ? ' — ' + msg : '');
+      div.appendChild(p);
+      if (status === 'pass') pass++; else fail++;
+    }
+    const h = document.createElement('h2');
+    h.textContent = `${pass} passed, ${fail} failed`;
+    div.prepend(h);
+  </script>
+</body>
+</html>

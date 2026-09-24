@@ -1,0 +1,99 @@
+:root {
+  --key-cell-size: 44px;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.font-monospace {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.key-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: .5rem;
+}
+
+.key-cell {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: .5rem;
+  padding: .35rem .5rem;
+  background: var(--bs-body-bg);
+}
+
+.key-cell .cipher-letter {
+  font-weight: 700;
+  font-size: 1.05rem;
+  width: 1.4rem;
+  text-align: center;
+  color: var(--bs-primary);
+}
+
+.key-cell .arrow {
+  color: var(--bs-secondary-color);
+}
+
+.key-cell input {
+  width: 2.6rem;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  border: 1px solid var(--bs-border-color);
+  border-radius: .35rem;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  padding: .15rem;
+}
+
+.key-cell input:focus {
+  outline: 2px solid var(--bs-primary);
+}
+
+.key-cell.unassigned {
+  opacity: .6;
+}
+
+.result-card {
+  border: 1px solid var(--bs-border-color);
+  border-radius: .6rem;
+  margin-bottom: .75rem;
+  overflow: hidden;
+}
+
+.result-card .result-head {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem;
+  background: var(--bs-tertiary-bg);
+  font-size: .85rem;
+}
+
+.result-card .result-body {
+  padding: .75rem;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.result-card.rank-1 {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 1px var(--bs-primary);
+}
+
+.score-badge {
+  font-variant-numeric: tabular-nums;
+}
+
+textarea[readonly] {
+  background: var(--bs-tertiary-bg);
+}
+
+@media (max-width: 576px) {
+  .key-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+}

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Substitution Cipher | Boxentriq</title>
+    <meta name="description" content="Encodes, decodes, and autosolves monoalphabetic substitutions with custom alphabets and language-aware scoring.">
+    <meta name="author" content="Johan Åhlén">
+    <link rel="icon" href="https://www.boxentriq.com/favicon.ico" type="image/x-icon" >
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" >
+    <link rel="canonical" href="https://www.boxentriq.com/ciphers/substitution-cipher" >
+    <meta property="og:url" content="https://www.boxentriq.com/ciphers/substitution-cipher" >
+    <meta property="og:type" content="website" >
+    <meta property="og:title" content="Substitution Cipher | Boxentriq" >
+    <meta property="og:description" content="Encodes, decodes, and autosolves monoalphabetic substitutions with custom alphabets and language-aware scoring." >
+    <meta property="og:image" content="https://www.boxentriq.com/Img/hacker-boxentriq-facebook-preview.jpg" >
+    <meta name="twitter:card" content="summary_large_image" >
+    <meta name="twitter:site" content="@boxentriq" >
+    <meta name="twitter:creator" content="@boxentriq" >
+    <meta name="localUrl" content="ciphers/substitution-cipher" >
+    <meta name="shortName" content="Substitution cipher" >
+    <meta name="release" content="2.0.250" >
+    <meta name="qenv" content="Production" >
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://www.boxentriq.com/#website","name":"Boxentriq","url":"https://www.boxentriq.com/","publisher":{"@id":"https://www.boxentriq.com/#organization"},"potentialAction":{"@type":"SearchAction","target":"https://www.boxentriq.com/search?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"Organization","@id":"https://www.boxentriq.com/#organization","name":"Boxentriq","alternateName":"Johan \u00C5hl\u00E9n AB","url":"https://www.boxentriq.com/","logo":{"@type":"ImageObject","@id":"https://www.boxentriq.com/#logo","url":"https://www.boxentriq.com/img/boxentriq_logo.svg"},"sameAs":["https://www.facebook.com/boxentriq","https://x.com/boxentriq","https://www.youtube.com/@boxentriq"]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.boxentriq.com/"},{"@type":"ListItem","position":2,"name":"Ciphers","item":"https://www.boxentriq.com/ciphers"},{"@type":"ListItem","position":3,"name":"Substitution cipher","item":"https://www.boxentriq.com/ciphers/substitution-cipher"}]},{"@type":"Article","headline":"Substitution Cipher","description":"Encodes, decodes, and autosolves monoalphabetic substitutions with custom alphabets and language-aware scoring.","url":"https://www.boxentriq.com/ciphers/substitution-cipher","author":{"@id":"https://www.boxentriq.com/#organization"},"publisher":{"@id":"https://www.boxentriq.com/#organization"},"isPartOf":{"@id":"https://www.boxentriq.com/#website"},"dateModified":"2026-07-18"},{"@type":"SoftwareApplication","name":"Substitution Cipher","description":"Encodes, decodes, and autosolves monoalphabetic substitutions with custom alphabets and language-aware scoring.","url":"https://www.boxentriq.com/ciphers/substitution-cipher","applicationCategory":"WebApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@id":"https://www.boxentriq.com/#organization"},"isPartOf":{"@id":"https://www.boxentriq.com/#website"}}]}</script>
+    <script>!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{};e.SENTRY_RELEASE={id:"bae62aae58fea484733491f6f948c313f01c2d78"};var t=(new e.Error).stack;t&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[t]="1b962011-f1be-41b1-9265-4081548435b1",e._sentryDebugIdIdentifier="sentry-dbid-1b962011-f1be-41b1-9265-4081548435b1")}catch(e){}}(),(()=>{"use strict";const e="boxentriqColorTheme",t="data-q-theme-preference",n=["light","dark"];function r(e){return"string"!=typeof e?null:n.includes(e)?e:null}const o=function(){try{return r(window.localStorage.getItem(e))}catch(e){return null}}(),i=null!=o?o:function(e=function(){return"function"==typeof window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches}()){return e?"dark":"light"}();!function(e,n=document.documentElement){n.setAttribute(t,e),n.setAttribute("data-bs-theme",e)}(i),o||function(t){try{window.localStorage.setItem(e,t)}catch(e){}}(i)})();</script>
+    <script>!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{};e.SENTRY_RELEASE={id:"bae62aae58fea484733491f6f948c313f01c2d78"};var n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b1a0181b-1928-4b24-8e3a-03e1bbf6dcf7",e._sentryDebugIdIdentifier="sentry-dbid-b1a0181b-1928-4b24-8e3a-03e1bbf6dcf7")}catch(e){}}(),(()=>{"use strict";const e="navigationPanelState";function n(e){return null==e?null:"number"==typeof e&&Number.isFinite(e)?e<280||e>960?null:e:null}const t=function(){const t={preferredWidth:null,dockedVisible:!0};try{const d=window.sessionStorage.getItem(e);if(!d)return t;const o=JSON.parse(d);return"object"!=typeof(i=o)||null===i?t:1!==o.version||"boolean"!=typeof o.dockedVisible?t:{preferredWidth:n(o.preferredWidth),dockedVisible:o.dockedVisible}}catch(e){return t}var i}(),i=window.matchMedia("(min-width: 1092px)").matches;document.documentElement.classList.toggle("navigation-panel-session-collapsed",i&&!t.dockedVisible)})();</script>
+    <script>
+    (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+            'gtm.start':
+                new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-MQKPXTR');
+</script>
+
+        <script>
+    (function (w, d) {
+        w.adthrive = w.adthrive || {};
+        w.adthrive.cmd = w.adthrive.cmd || [];
+        w.adthrive.plugin = 'adthrive-ads-manual';
+        w.adthrive.host = 'ads.adthrive.com';
+        var s = d.createElement('script');
+        s.async = true;
+        s.referrerpolicy = 'no-referrer-when-downgrade';
+        s.src = 'https://' + w.adthrive.host + '/sites/67eb028cd5aa1556529e18d0/ads.min.js?referrer=' + w.encodeURIComponent(w.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
+        var n = d.getElementsByTagName('script')[0];
+        n.parentNode.insertBefore(s, n);
+    })(window, document);
+</script>
+
+    <link href="/css/bootstrap.css?v=803dc0df" rel="stylesheet">
+    <link href="/css/site.css?v=4023c908" rel="stylesheet">
+    <script src="/js/bundles/vendors.js?v=e5a22fb0" defer></script>
+    <script src="/js/bundles/main.js?v=575d8b5a" defer></script>
+    
+        
+    <script src="/js/bundles/substitution-cipher.js?v=cb91190f" defer="true"></script>
+
+    
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MQKPXTR"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div id="layoutShell" class="layout-shell">
+        <div class="offcanvas offcanvas-start navigation-offcanvas" tabindex="-1" id="navigationPanel" aria-labelledby="navigationPanelLabel" data-bs-scroll="true" data-bs-backdrop="false">
+    <div class="offcanvas-header border-bottom">
+        <div class="d-flex align-items-center gap-1">
+            <a class="navigation-icon-control" href="/" aria-label="Go to start page">
+                <span class="nav-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+            </a>
+            <h5 class="offcanvas-title text-alternate2" id="navigationPanelLabel">Navigation</h5>
+        </div>
+        <button type="button" class="btn-close" id="navigationPanelClose" data-q-navigation-close="true" aria-label="Close navigation panel"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column gap-3">
+        <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-between gap-2 navigation-workspace-toggle"
+            id="navigationWorkspaceToggle" data-q-workspace-open="true" aria-controls="workspacePanel" aria-expanded="false" aria-label="Open My Saved Items panel">
+            <span class="d-inline-flex align-items-center gap-2">
+                <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+</span>
+                <span>My Saved Items</span>
+                <span id="workspaceCountBadge" class="workspace-badge badge rounded-pill d-none" aria-live="polite">0</span>
+            </span>
+            <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg></span>
+        </button>
+        <form id="navigationPanelSearchForm" class="border border-primary-subtle rounded-3 p-3 bg-surface-brand-subtle" role="search" novalidate>
+            <div class="input-group">
+                <label class="input-group-text" for="navigationPanelSearchInput"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></label>
+                <input type="search" id="navigationPanelSearchInput" class="form-control" autocomplete="off" placeholder="Search..." aria-label="Search tools" />
+            </div>
+        </form>
+        <nav id="navigationPanelContent" class="navigation-panel-content flex-grow-1 overflow-auto" aria-label="Browse tools and articles">
+            <div id="navigationBrowseView">
+                <div class="mb-4">
+                    <h6 class="small text-muted fw-semibold mb-2">Featured Links</h6>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action navigation-panel-page-link d-flex align-items-center gap-2" href="/contact" title="Contact" data-q-contact-modal-trigger="true" aria-controls="contactModal" aria-haspopup="dialog">
+                            <span class="d-inline-flex flex-shrink-0" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></span>
+                            <span>Contact</span>
+                        </a>
+                        <a class="list-group-item list-group-item-action navigation-panel-page-link d-flex align-items-center gap-2" href="/about" title="About">
+                            <span class="d-inline-flex flex-shrink-0" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+</span>
+                            <span>About</span>
+                        </a>
+                    </div>
+                </div>
+                    <div class="mb-2">
+                        <h6 class="small text-muted fw-semibold mb-2">Categories</h6>
+                        <div class="list-group" id="navigationPanelCategories">
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3" type="button" id="navigationCategoryToggle0" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse0"
+                                        aria-expanded="true" aria-controls="navigationCategoryCollapse0">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/><circle cx="6" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="18" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
+</span>
+                                        <span class="fw-semibold">Ciphers</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m18 15-6-6-6 6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse0" class="collapse show" aria-labelledby="navigationCategoryToggle0" data-navigation-category="ciphers">
+                                            <div class="px-3 pb-3">
+                                                <div class="list-group list-group-flush navigation-panel-category-pages">
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers" title="Overview">Overview</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link navigation-panel-page-link-current" href="/ciphers/substitution-cipher" title="Substitution cipher" aria-current="page">Substitution Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/encodings/a1z26" title="A1z26">A1Z26 Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/adfgvx-cipher" title="ADFGVX cipher">ADFGVX Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/adfgx-cipher" title="ADFGX cipher">ADFGX Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/aes-cipher" title="Aes">AES Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/affine-cipher" title="Affine cipher">Affine Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/amsco-cipher" title="AMSCO">AMSCO Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/atbash-cipher" title="Atbash cipher">Atbash Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/baconian-cipher" title="Baconian cipher">Baconian Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/beaufort-autokey-cipher" title="Beaufort autokey cipher">Beaufort Autokey Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/beaufort-cipher" title="Beaufort cipher">Beaufort Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/bifid-cipher" title="Bifid cipher">Bifid Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/blowfish-cipher" title="Blowfish">Blowfish Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/book-cipher" title="Book cipher">Book Cipher Decoder</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/caesar-cipher" title="Caesar cipher">Caesar Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/cicada-3301-totient-cipher" title="Cicada totient">Cicada 3301 Totient Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/columnar-transposition-cipher" title="Columnar transposition">Columnar Transposition Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/cryptogram" title="Cryptogram">Cryptogram</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/alphabets/dancing-men-cipher" title="Dancing men cipher">Dancing Men Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/des-cipher" title="Des cipher">DES Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/double-transposition-cipher" title="Double transposition">Double Transposition Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/enigma-machine" title="Enigma machine">Enigma Machine Simulator</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/four-square-cipher" title="Four-square cipher">Four-Square Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/grandpre-cipher" title="Grandpr&#xE9; cipher">Grandpr&#xE9; Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/gronsfeld-cipher" title="Gronsfeld cipher">Gronsfeld Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/keyed-caesar-cipher" title="Keyed Caesar cipher">Keyed Caesar Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/morbit-cipher" title="Morbit cipher">Morbit Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/nihilist-cipher" title="Nihilist substitution cipher">Nihilist Substitution Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/numeric-homophonic-cipher" title="Numeric homophonic cipher">Numeric Homophonic Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/one-time-pad" title="One-time pad">One-Time Pad (Vernam Cipher)</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/alphabets/pigpen-cipher" title="Pigpen cipher">Pigpen Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/playfair-cipher" title="Playfair cipher">Playfair Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/pollux-cipher" title="Pollux cipher">Pollux Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/porta-cipher" title="Porta cipher">Porta Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rail-fence-cipher" title="Rail fence cipher">Rail Fence Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rc4-cipher" title="Rc4 cipher">RC4 Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rot-n-decoder" title="ROT-N">ROT-N</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rot13" title="ROT13">ROT13</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rot18" title="ROT18">ROT18</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rot47" title="ROT47">ROT47</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rot5" title="ROT5">ROT5</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/route-transposition" title="Route transposition">Route Transposition Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/rsa-cipher" title="Rsa">RSA Encryption</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/scytale-cipher" title="Scytale cipher">Scytale Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/trifid-cipher" title="Trifid cipher">Trifid Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/variant-beaufort-cipher" title="Variant beaufort cipher">Variant Beaufort Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/vigenere-autokey-cipher" title="Vigenere autokey cipher">Vigenere Autokey Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/vigenere-cipher" title="Vigenere cipher">Vigenere Cipher</a>
+                                                        <a class="list-group-item list-group-item-action navigation-panel-page-link" href="/ciphers/xor-cipher" title="Xor cipher">XOR Cipher</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle1" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse1"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse1">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg></span>
+                                        <span class="fw-semibold">Alphabets &amp; Symbols</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse1" class="collapse" aria-labelledby="navigationCategoryToggle1" data-navigation-category="alphabets"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle2" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse2"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse2">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M10.7 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v4.1"/><path d="m21 21-1.9-1.9"/><circle cx="17" cy="17" r="3"/></svg></span>
+                                        <span class="fw-semibold">Analysis</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse2" class="collapse" aria-labelledby="navigationCategoryToggle2" data-navigation-category="analysis"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle3" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse3"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse3">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+</span>
+                                        <span class="fw-semibold">Audio Tools</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse3" class="collapse" aria-labelledby="navigationCategoryToggle3" data-navigation-category="audio"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle4" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse4"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse4">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+</span>
+                                        <span class="fw-semibold">Encodings</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse4" class="collapse" aria-labelledby="navigationCategoryToggle4" data-navigation-category="encodings"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle5" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse5"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse5">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M10 3 8 21"/><path d="m16 3-2 18"/><path d="M4 9h18"/><path d="M3 15h18"/></svg>
+</span>
+                                        <span class="fw-semibold">Hash Functions</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse5" class="collapse" aria-labelledby="navigationCategoryToggle5" data-navigation-category="hashing"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle6" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse6"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse6">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><circle cx="10" cy="12" r="2"/><path d="m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22"/></svg></span>
+                                        <span class="fw-semibold">Image Tools</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse6" class="collapse" aria-labelledby="navigationCategoryToggle6" data-navigation-category="imaging"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle7" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse7"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse7">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M16 14v4"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+</span>
+                                        <span class="fw-semibold">Math</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse7" class="collapse" aria-labelledby="navigationCategoryToggle7" data-navigation-category="math"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle8" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse8"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse8">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M7 3H5a2 2 0 0 0-2 2v2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M17 21h2a2 2 0 0 0 2-2v-2"/><path d="M7 12s2-3 5-3 5 3 5 3-2 3-5 3-5-3-5-3Z"/><circle cx="12" cy="12" r="1"/></svg>
+</span>
+                                        <span class="fw-semibold">Steganography</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse8" class="collapse" aria-labelledby="navigationCategoryToggle8" data-navigation-category="steganography"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle9" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse9"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse9">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 8h7"/><path d="M8 12h6"/><path d="M11 16h5"/></svg></span>
+                                        <span class="fw-semibold">Text &amp; Word Tools</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse9" class="collapse" aria-labelledby="navigationCategoryToggle9" data-navigation-category="text-tools"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle10" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse10"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse10">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3Z"/><path d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3Z"/></svg>
+</span>
+                                        <span class="fw-semibold">Guides</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse10" class="collapse" aria-labelledby="navigationCategoryToggle10" data-navigation-category="guides"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle11" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse11"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse11">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg></span>
+                                        <span class="fw-semibold">Puzzles</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse11" class="collapse" aria-labelledby="navigationCategoryToggle11" data-navigation-category="puzzle"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle12" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse12"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse12">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+</span>
+                                        <span class="fw-semibold">Site Info</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse12" class="collapse" aria-labelledby="navigationCategoryToggle12" data-navigation-category="site"></div>
+                                </div>
+                                <div class="list-group-item p-0">
+                                    <button class="list-group-item list-group-item-action navigation-panel-category d-flex align-items-center gap-2 w-100 text-start border-0 px-3 py-3 collapsed" type="button" id="navigationCategoryToggle13" data-bs-toggle="collapse" data-bs-target="#navigationCategoryCollapse13"
+                                        aria-expanded="false" aria-controls="navigationCategoryCollapse13">
+                                        <span class="d-inline-flex flex-shrink-0 fs-5 lh-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg></span>
+                                        <span class="fw-semibold">Navigation</span>
+                                        <span class="ms-auto text-muted" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+                                    </button>
+                                        <div id="navigationCategoryCollapse13" class="collapse" aria-labelledby="navigationCategoryToggle13" data-navigation-category="navigation"></div>
+                                </div>
+                        </div>
+                    </div>
+            </div>
+            <div id="navigationSearchView" class="d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex flex-column">
+                        <span class="text-uppercase text-muted small fw-semibold">Search results</span>
+                        <span id="navigationSearchCount" class="fw-semibold" aria-live="polite"></span>
+                    </div>
+                    <button type="button" class="btn btn-link btn-sm text-decoration-none p-0" id="navigationSearchReset">Back</button>
+                </div>
+                <div id="navigationSearchResults"></div>
+            </div>
+        </nav>
+    </div>
+    <div id="navigationPanelResizer" class="navigation-resizer navigation-resizer-vertical" role="separator" aria-label="Resize navigation panel"></div>
+</div>
+
+        <div class="grid">
+            <div class="nav-bg"></div>
+<nav class="nav" id="mainNav">
+    <button class="navigation-icon-control nav-toggle flex-shrink-0" type="button" id="navigationPanelToggle" data-q-navigation-toggle="true"
+        aria-controls="navigationPanel" aria-expanded="false" aria-label="Toggle navigation panel">
+        <span class="nav-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg></span>
+    </button>
+    <a class="nav-brand js-scroll-trigger flex-shrink-1" href="/"><svg width="10em" viewBox="0 0 700 80" xmlns="http://www.w3.org/2000/svg">
+	<title>Boxentriq logo</title>
+	<defs>
+		<clipPath id="boxentriqLogo_clipPath">
+			<path d="M722 768h78v64.8h-78zm0 0"/>
+		</clipPath>
+	</defs>
+	<path d="M62.9 33.3H33.5v-10h29.4l3.7 4.8zm0 21.5H33.5v-9.9h29.4l3.7 5.2zm9-44.3H18.2v57h53.7l11.5-17.4-7.2-11 7.2-11m66.5 26.7h-34.6V23.3h34.6zm-38.4-44.3-11.6 13v31l11.6 13h42.2l11.5-13v-31l-11.5-13m74.1 0-16.3 18.3-16.3-18.3H177l25.4 28.6L177 67.6h18.2l16.3-18.4 16.3 18.4h18l-25.3-28.5 25.4-28.6M310 23.3l11.3-12.8h-60.7v57h47.6l11.4-12.7H276v-9.9h27.6L314 33.3h-38v-10m107-12.7v34l-36.8-34.1h-10.7v57h15.3V34.3l36 33.3h11.6V10.5h-15.2m37.7 12.8h15v44.3h15.3V23.3h15.1l11.3-12.8h-68m123.6 25h-29.5V23.3h29.5l4 5.9zm8.2-25h-53v57h15.3v-19H533l4.6 5v14H553V51.2l-8.8-9.9 8.8-13.2m21.3-17.5v56.9h15.3v-57h-15.1" fill="#008009"/>
+	<g clip-path="url(#boxentriqLogo_clipPath)" transform="translate(-112.3 -758.1)">
+		<path d="M737.6 781.4h34.7v31.5h-34.7Zm62.4 51.4-16-13.7 3.6-6.2v-31.3l-11.5-13h-42.2l-11.6 13v31l11.6 13h38.8l9 7.2" fill="#008009"/>
+	</g>
+</svg></a>
+    <button class="navigation-icon-control navigation-theme-toggle flex-shrink-0 ms-auto" type="button" id="colorThemeToggle"
+        data-q-theme-toggle="true" aria-label="Switch to dark theme" title="Switch to dark theme">
+        <span class="navigation-theme-icon navigation-theme-icon-dark" data-q-theme-icon="dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+</span>
+        <span class="navigation-theme-icon navigation-theme-icon-light" data-q-theme-icon="light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+</span>
+    </button>
+</nav>
+
+            
+
+            <div class="head-bg"></div>
+            <div class="head">
+            <div class="breadcrumb-article d-sm-none mb-2">
+                <a class="breadcrumb-article-link" href="/ciphers">&larr; Ciphers</a>
+            </div>
+        <nav class="d-none d-sm-block" aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-article mb-2">
+                            <li class="breadcrumb-item">
+                                <a href="/" class="content-link">Home</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="/ciphers" class="content-link">Ciphers</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Substitution cipher</li>
+            </ol>
+        </nav>
+    
+    <h1>Substitution Cipher</h1>
+
+    <p class="lead">Encodes, decodes, and autosolves monoalphabetic substitutions with custom alphabets and language-aware scoring.</p>
+</div>
+
+                <div id="sidebar1" class="sidebar1">
+                    <nav class="navbar toc d-block">
+    <span class="navbar-brand h6">On this page</span>
+    <a class="nav-link" href="#">Start</a>
+        <a class="nav-link" href="#tool">Substitution Cipher</a>
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#options">Options</a>
+        <a class="nav-link" href="#what-is-substitution-cipher">What is a substitution cipher?</a>
+        <a class="nav-link" href="#history">History and facts</a>
+        <a class="nav-link" href="#usage">Where You&#x2019;ll Encounter It</a>
+</nav>
+
+
+                </div>
+
+            <main id="main" class="main-content main">
+                    <div class="quick-actions justify-content-end mb-3">
+                <a class="quick-action" href="/tags/classical-ciphers" aria-label="Browse tag Classical Ciphers">#Classical Ciphers</a>
+                <a class="quick-action" href="/tags/monoalphabetic-ciphers" aria-label="Browse tag Monoalphabetic Ciphers">#Monoalphabetic Ciphers</a>
+    </div>
+
+<div class="ad-free">
+    <p>
+        A substitution cipher rearranges the alphabet so every ciphertext letter consistently stands in for
+        another letter or symbol. This page is a complete guide to substitution ciphers plus a hands-on tool for
+        translating and cracking them.
+    </p>
+    <p>
+        Are you unsure about the cipher type? Use the <a href="/analysis/cipher-identifier" class="content-link">Cipher Identifier</a>
+        to find the right tool.
+    </p>
+</div>
+<div class="ad-free">
+    <h5>New to the tool? Try a quick example.</h5>
+    <div class="quick-actions">
+        <a class="quick-action" href="#manual" data-q-sample='{ "toolInput": "Vu vi vebmiivodt um isj amp zvyiu uat vcts tkutytc ej oysvk; ohu mkwt wmkwtvgtc, vu ashkutc et csj skc kvrau.", "letterTranslationsString": "HPDLMXVUSYNQOKBWZGAETICJRF", "languageSelector": "en" }' role="button">Edgar Allan Poe sample</a>
+        <a class="quick-action" href="#manual" data-q-sample='{ "toolInput": "Ybv kje mbbr jrr bm fod tdbtrd ubsd bm fod fhsd, jel ubsd bm fod tdbtrd jrr bm fod fhsd, avf ybv kje’f mbbr jrr bm fod tdbtrd jrr bm fod fhsd.", "letterTranslationsString": "??????????????????????????", "languageSelector": "en" }' role="button">Try solving this</a>
+        <a class="quick-action" href="#autosolver" data-q-sample='{ "autosolverInput": "rmhzmrgb wlrmt gsv hznv gsrmt levi zmw levi ztzrm zmw vckvxgrmt wruuvivmg ivhfogh", "languageSelector": "en", "spacingMode": "1", "expectedText": "" }' role="button">Autosolve an Aristocrat</a>
+        <a class="quick-action" href="#autosolver" data-q-sample='{ "autosolverInput": "xszmtvdroomlgxlnvrudvdzrgulihlnvlmvvohvlihlnvlgsvigrnvdvzivgsvlmvdvszevyvvmdzrgrmtuli", "languageSelector": "en", "spacingMode": "3", "expectedText": "" }' role="button">Autosolve a Patristocrat</a>
+    </div>
+</div>
+
+<div id="tool" class="bg-tool mb-4 rounded-2 py-3 px-3">
+    <div class="d-flex align-items-start justify-content-between gap-2 mb-4">
+        <h2 id="toolTitle" class="flex-shrink-1">Substitution Cipher</h2>
+        <div class="d-flex flex-column align-items-end gap-2">
+            <span class="badge text-wrap bg-surface-muted text-body d-inline-flex align-items-center text-start gap-1 tool-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                Your data stays local.
+            </span>
+            <a href="/contact" class="btn btn-outline-secondary btn-xs d-inline-flex align-items-center gap-1 overflow-hidden" data-q-contact-modal-trigger="true" aria-controls="contactModal" aria-haspopup="dialog">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                Feedback
+            </a>
+        </div>
+    </div>
+    
+    
+
+<div class="row g-3 mb-1"
+     id="languageSelector-root"
+     data-q-component="languageselector"
+     data-q-ls-enable-edit="true"
+     data-q-ls-onlysupported="false">
+
+    <div class="col-12 col-md-6" data-q-ls-role="language-column">
+        <label for="languageSelector" class="form-label fw-bold">Language</label>
+        <select class="form-select"
+                id="languageSelector"
+                data-q-ls-role="language">
+                <option value="en" selected="selected">English (English)</option>
+                <option value="bs">Bosnian (Bosanski)</option>
+                <option value="hr">Croatian (Hrvatski)</option>
+                <option value="cs">Czech (&#x10C;e&#x161;tina)</option>
+                <option value="da">Danish (Dansk)</option>
+                <option value="nl">Dutch (Nederlands)</option>
+                <option value="fi">Finnish (Suomi)</option>
+                <option value="fr">French (Fran&#xE7;ais)</option>
+                <option value="de">German (Deutsch)</option>
+                <option value="el">Greek (&#x395;&#x3BB;&#x3BB;&#x3B7;&#x3BD;&#x3B9;&#x3BA;&#x3AC;)</option>
+                <option value="he">Hebrew (&#x5E2;&#x5D1;&#x5E8;&#x5D9;&#x5EA;)</option>
+                <option value="hu">Hungarian (Magyar)</option>
+                <option value="is">Icelandic (&#xCD;slenska)</option>
+                <option value="it">Italian (Italiano)</option>
+                <option value="nb">Norwegian (Norsk bokm&#xE5;l)</option>
+                <option value="pl">Polish (Polski)</option>
+                <option value="pt">Portuguese (Portugu&#xEA;s)</option>
+                <option value="ro">Romanian (Rom&#xE2;n&#x103;)</option>
+                <option value="ru">Russian (&#x420;&#x443;&#x441;&#x441;&#x43A;&#x438;&#x439;)</option>
+                <option value="sr">Serbian (&#x421;&#x440;&#x43F;&#x441;&#x43A;&#x438;)</option>
+                <option value="sk">Slovak (Sloven&#x10D;ina)</option>
+                <option value="es">Spanish (Espa&#xF1;ol)</option>
+                <option value="sv">Swedish (Svenska)</option>
+                <option value="tr">Turkish (T&#xFC;rk&#xE7;e)</option>
+                <option value="uk">Ukrainian (&#x423;&#x43A;&#x440;&#x430;&#x457;&#x43D;&#x441;&#x44C;&#x43A;&#x430;)</option>
+                <option value="gp">Gematria Primus (Cicada 3301)</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-md-6" data-q-ls-role="alphabet-column" aria-hidden="false">
+
+        <div class="d-flex align-items-baseline">
+            <label for="languageSelector-alphabet" class="form-label fw-bold">Alphabet</label>
+            <small class="ms-2" data-q-ls-role="status"></small>
+        </div>
+
+        <input id="languageSelector-alphabet"
+               type="text"
+               value="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+               class="form-control font-monospace"
+               readonly
+               inputmode="text"
+               autocomplete="off"
+               autocorrect="off"
+               autocapitalize="characters"
+               spellcheck="false"
+               data-q-ls-role="alphabet" />
+
+        <div class="invalid-feedback" data-q-ls-role="error"></div>
+
+                <div class="row g-2 mt-0">
+                    <div class="col-6">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm w-100"
+                                data-q-ls-role="preset-native">
+                            Original (26)
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm w-100 d-none"
+                                disabled="disabled"
+                                data-q-ls-role="preset-az">
+                            A–Z (26)
+                        </button>
+                    </div>
+                </div>
+            <div class="d-none mt-2" data-q-ls-role="actions">
+                <div class="d-grid gap-2 d-md-flex d-md-justify-content-end">
+                    <button type="button"
+                            class="btn btn-primary btn-sm order-md-first"
+                            data-q-ls-role="btn-use">
+                        OK
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm order-md-last"
+                            data-q-ls-role="btn-cancel">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+    </div>
+</div>
+
+    <div id="autosolverLanguageNotice" class="form-text">
+        Note: Autosolver supports fewer languages.
+    </div>
+
+    <div class="h6 mt-3" id="substitutionMode-label">Manual/autosolver mode</div>
+<ul class="nav nav-tabs q-tool-mode-tabs position-static" id="substitutionMode" role="tablist" aria-labelledby="substitutionMode-label">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="substitutionMode-manual" data-bs-toggle="tab" data-bs-target="#manual"
+            type="button" role="tab" aria-controls="manual" aria-selected="true">
+            <span class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></span>
+            <span class="align-middle fw-bold">Manual</span>
+                <div class="x-small text-muted">Translate with a key</div>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="substitutionMode-auto" data-bs-toggle="tab" data-bs-target="#autosolver"
+            type="button" role="tab" aria-controls="autosolver" aria-selected="false">✨
+            <span class="align-middle fw-bold">Autosolve</span>
+                <div class="x-small text-muted">Use automagic solver</div>
+        </button>
+    </li>
+</ul>
+
+
+    <div class="tab-content" id="substitutionModeContent">
+        <div id="manual" class="tab-pane show active" role="tabpanel" aria-labelledby="substitutionMode-manual">
+            <p class="small text-muted"><em>Manual mode: </em> Enter text and fill the mapping grid or key string.</p>
+
+            <div class="mb-3" data-q-component="textarea-tools" data-q-targetid="toolInput">
+    <div class="d-flex align-items-center rounded-top bg-textarea-header q-textarea-header">
+        <label id="toolInput-heading" for="toolInput" class="h4 m-2 me-auto">Ciphertext or plaintext</label>
+        <div class="d-flex align-items-center gap-1 me-2 q-textarea-header-actions">
+            <button type="button"
+                    class="btn btn-outline-secondary btn-copy btn-sm d-inline-flex align-items-center gap-1"
+                    data-q-component="copybtn"
+                    data-q-header-action="copy"
+                    data-q-targetid="toolInput"
+                    aria-label="Copy">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="d-none d-sm-inline">Copy</span>
+            </button>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-paste btn-sm d-inline-flex align-items-center gap-1"
+                        data-q-component="pastebtn"
+                        data-q-header-action="paste"
+                        data-q-targetid="toolInput"
+                        aria-label="Paste">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M11 14h10"/><path d="M16 4h2a2 2 0 0 1 2 2v1.344"/><path d="m17 18 4-4-4-4"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span class="d-none d-sm-inline">Paste</span>
+                </button>
+        </div>
+    </div>
+    <textarea id="toolInput"
+              class="form-control font-monospace rounded-0"
+              rows="4"
+              data-q-component="input"
+              spellcheck="false"
+              placeholder="Paste the substitution cipher text or plaintext here..."
+              data-q-allow-drop="true"              ></textarea>
+    <div class="d-flex align-items-center justify-content-end rounded-bottom bg-textarea-header q-textarea-footer">
+        <button type="button"
+                class="btn btn-outline-secondary btn-texttools btn-sm d-inline-flex align-items-center gap-1"
+                data-q-action="toggle-tools"
+                aria-expanded="false"
+                aria-controls="toolInput-tools-tray">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 8h7"/><path d="M8 12h6"/><path d="M11 16h5"/></svg>
+            <span>Tools</span>
+            <span data-q-role="tools-chevron" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+    </div>
+</div>
+
+
+            <details class="mb-3" open>
+                <summary class="h4 mb-1">Letter translations</summary>
+                <p class="form-text mb-2">This is your key as a shareable string. The string and the grid below stay in sync.
+                    Unassigned letters are represented by <code>?</code>.</p>
+                <div class="input-group has-validation">
+                    <input type="text" class="form-control font-monospace" id="letterTranslationsString" autocomplete="off"
+                        spellcheck="false" readonly />
+                    <div id="letterTranslationsFeedback" class="invalid-feedback"></div>
+                </div>
+                <div id="letterTranslationsActions" class="d-none mt-2">
+                    <div class="d-grid gap-2 d-md-flex d-md-justify-content-end">
+                        <button id="letterTranslationsUseButton" class="btn btn-primary btn-sm order-md-first" type="button">OK</button>
+                        <button id="letterTranslationsCancelButton" class="btn btn-outline-secondary btn-sm order-md-last"
+                            type="button">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mb-2 mt-2">
+                    <button id="clearKeyButton" class="btn btn-sm btn-outline-secondary" type="button">Clear key</button>
+                    <button id="randomizeKeyButton" class="btn btn-sm btn-outline-primary" type="button">Randomize
+                        key</button>
+                    <button id="invertKeyButton" class="btn btn-sm btn-outline-primary" type="button">Invert key</button>
+                </div>
+                <div id="letterTranslationsGrid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2"
+                    aria-live="polite" aria-label="Letter translations mapping"></div>
+            </details>
+
+            <div class="mb-3" data-q-component="textarea-tools" data-q-targetid="toolOutput">
+    <div class="d-flex align-items-center rounded-top bg-textarea-header q-textarea-header">
+        <label id="toolOutput-heading" for="toolOutput" class="h4 m-2 me-auto">Output</label>
+        <div class="d-flex align-items-center gap-1 me-2 q-textarea-header-actions">
+            <button type="button"
+                    class="btn btn-outline-secondary btn-copy btn-sm d-inline-flex align-items-center gap-1"
+                    data-q-component="copybtn"
+                    data-q-header-action="copy"
+                    data-q-targetid="toolOutput"
+                    aria-label="Copy">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="d-none d-sm-inline">Copy</span>
+            </button>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-texttools btn-sm d-inline-flex align-items-center gap-1"
+                        data-q-component="downloadbtn"
+                        data-q-header-action="download"
+                        data-q-targetid="toolOutput"
+                        aria-label="Download">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg><span class="d-none d-sm-inline">Download</span>
+                </button>
+        </div>
+    </div>
+    <textarea id="toolOutput"
+              class="form-control font-monospace rounded-0"
+              rows="4"
+              data-q-component="output"
+              spellcheck="false"
+              placeholder="The output will be shown here..."
+                            ></textarea>
+    <div class="d-flex align-items-center justify-content-end rounded-bottom bg-textarea-header q-textarea-footer">
+        <button type="button"
+                class="btn btn-outline-secondary btn-texttools btn-sm d-inline-flex align-items-center gap-1"
+                data-q-action="toggle-tools"
+                aria-expanded="false"
+                aria-controls="toolOutput-tools-tray">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 8h7"/><path d="M8 12h6"/><path d="M11 16h5"/></svg>
+            <span>Tools</span>
+            <span data-q-role="tools-chevron" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+    </div>
+        <div id="toolOutput-feedback" class="invalid-feedback">
+            This field is for output. You should type in the input field instead.
+        </div>
+</div>
+
+
+            <div class="accordion mb-3" id="manualToolsAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="letterFrequencyHeading">
+                        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#letterFrequencyCollapse" aria-expanded="true"
+                            aria-controls="letterFrequencyCollapse">
+                            Letter frequencies
+                        </button>
+                    </h2>
+                    <div id="letterFrequencyCollapse" class="accordion-collapse collapse show"
+                        aria-labelledby="letterFrequencyHeading">
+                        <div class="accordion-body">
+                            <p class="form-text mb-2">These are the letter frequencies of your input text. They can help you identify common
+                                letters and make educated guesses.</p>
+                            <div id="letterFrequencies" class="mt-2"></div>
+                            <div id="letterFrequenciesBenchmark"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="inplaceSolverHeading">
+                        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#inplaceSolverCollapse" aria-expanded="true"
+                            aria-controls="inplaceSolverCollapse">
+                            Inplace solver
+                        </button>
+                    </h2>
+                    <div id="inplaceSolverCollapse" class="accordion-collapse collapse show"
+                        aria-labelledby="inplaceSolverHeading">
+                        <div class="accordion-body">
+                            <p class="form-text mb-2">Here you can easily test assigning letters and directly see the results.
+                                Your edits here are automatically synced with the letter translations grid above.</p>
+                            <div id="inplaceSolverFeedback" class="text-danger small mb-2 d-none" aria-live="polite"></div>
+                            <div id="inplaceSolverContainer" class="d-flex flex-wrap gap-1 align-items-end"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="autosolver" class="tab-pane" role="tabpanel" aria-labelledby="substitutionMode-auto">
+            <p class="small text-muted"><em>✨Autosolver: </em> Paste ciphertext. Adjust options, then run.</p>
+
+            <div class="mb-3" data-q-component="textarea-tools" data-q-targetid="autosolverInput">
+    <div class="d-flex align-items-center rounded-top bg-textarea-header q-textarea-header">
+        <label id="autosolverInput-heading" for="autosolverInput" class="h4 m-2 me-auto">Ciphertext</label>
+        <div class="d-flex align-items-center gap-1 me-2 q-textarea-header-actions">
+            <button type="button"
+                    class="btn btn-outline-secondary btn-copy btn-sm d-inline-flex align-items-center gap-1"
+                    data-q-component="copybtn"
+                    data-q-header-action="copy"
+                    data-q-targetid="autosolverInput"
+                    aria-label="Copy">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="d-none d-sm-inline">Copy</span>
+            </button>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-paste btn-sm d-inline-flex align-items-center gap-1"
+                        data-q-component="pastebtn"
+                        data-q-header-action="paste"
+                        data-q-targetid="autosolverInput"
+                        aria-label="Paste">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M11 14h10"/><path d="M16 4h2a2 2 0 0 1 2 2v1.344"/><path d="m17 18 4-4-4-4"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span class="d-none d-sm-inline">Paste</span>
+                </button>
+        </div>
+    </div>
+    <textarea id="autosolverInput"
+              class="form-control font-monospace rounded-0"
+              rows="4"
+              data-q-component="input"
+              spellcheck="false"
+              placeholder="Type the substitution-encrypted message here..."
+              data-q-allow-drop="true"              ></textarea>
+    <div class="d-flex align-items-center justify-content-end rounded-bottom bg-textarea-header q-textarea-footer">
+        <button type="button"
+                class="btn btn-outline-secondary btn-texttools btn-sm d-inline-flex align-items-center gap-1"
+                data-q-action="toggle-tools"
+                aria-expanded="false"
+                aria-controls="autosolverInput-tools-tray">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 8h7"/><path d="M8 12h6"/><path d="M11 16h5"/></svg>
+            <span>Tools</span>
+            <span data-q-role="tools-chevron" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+    </div>
+</div>
+
+            <div id="ciphertextFeedback" class="invalid-feedback d-none">
+                Please provide your ciphertext.
+            </div>
+
+            <div class="mt-3 mb-3">
+                <div class="h6">Basic options</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="searchDepth" class="form-label">Search depth</label>
+                        <input id="searchDepth" class="form-control" type="number" min="100" step="1000" max="200000"
+                            value="10000" />
+                        <div class="form-text">Higher values spend more time exploring alternate keys.</div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="numberOfResults" class="form-label">Results to keep</label>
+                        <input id="numberOfResults" class="form-control" type="number" min="1" max="50" value="5" />
+                    </div>
+                    <div class="col-sm-12 col-lg-4">
+                        <label for="expectedText" class="form-label">Partial text (optional)</label>
+                        <input id="expectedText" class="form-control" type="text" placeholder="" />
+                        <div class="form-text">If you know any part of the text, enter it here to
+                            prioritize it in the results.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion mb-3" id="autosolverOptionsAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="autosolverOptionsAdvancedHeading">
+                        <button class="accordion-button fw-bold collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#autosolverOptionsAdvanced" aria-expanded="false"
+                            aria-controls="autosolverOptionsAdvanced">
+                            Advanced options
+                        </button>
+                    </h2>
+                    <div id="autosolverOptionsAdvanced" class="accordion-collapse collapse"
+                        aria-labelledby="autosolverOptionsAdvancedHeading" data-bs-parent="#autosolverOptionsAccordion">
+                        <div class="accordion-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-12">
+                                    <label for="spacingMode" class="form-label">Spacing mode</label>
+                                    <select id="spacingMode" class="form-select">
+                                        <option value="0" selected>Automatic</option>
+                                        <option value="1">Keep existing spacing</option>
+                                        <option value="2">Remove spacing</option>
+                                        <option value="3">Resegment words</option>
+                                    </select>
+                                    <div class="form-text">Controls how spaces are handled during solving.</div>
+                                </div>
+                            </div>
+
+                            <p class="form-text mb-2">Optionally enter any letter translations that you know. Leave fields blank if you are
+                                unsure.</p>
+                            <div id="knownLettersGrid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2"
+                                aria-live="polite" aria-label="Known letters mapping"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-12">
+                    <label for="solverIntelligence" class="form-label">Analysis quality</label>
+                    <select id="solverIntelligence" class="form-select">
+                        <option value="true" selected>Standard</option>
+                        <option value="false">High</option>
+                    </select>
+                    <div class="form-text">Higher analysis quality improves results, but uses more memory and may not run on memory-limited devices.</div>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button id="autosolveButton" type="button" class="btn btn-primary d-inline-flex align-items-center gap-2"><span id="autosolveButton-spinner" class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+<span id="autosolveButton-label">✨Run autosolver</span></button>
+                    </div>
+                </div>
+            </div>
+
+            
+<div id="progressBarWrapper" class="progress mt-3 d-none">
+    <div id="progressBar"
+         class="progress-bar"
+         role="progressbar"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         aria-valuenow="0"
+         >
+        0%
+    </div>
+</div>
+
+            <p id="solverStatus" class="small text-muted mt-2 mb-0">Idle. Configure the solver and press “Run autosolver”.</p>
+
+            
+<div class="table-responsive mt-3">
+    <table class="table table-striped align-middle mb-0" id="resultsTable">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 8rem;">Relevance</th>
+                <th scope="col" style="width: 12rem;">Key</th>
+                <th scope="col">Plaintext</th>
+            </tr>
+        </thead>
+        <tbody id="resultsTableBody">
+            <tr>
+                <td colspan="3" class="text-muted fst-italic">
+                    No results yet. Run the autosolver to populate this table.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<h2 id="features">Features</h2>
+<ul class="list-spaced mb-4">
+    <li>Tool to solve substitution ciphers either manually or with an intelligent autosolver.</li>
+    <li>Live letter-translation grid and key string stay in sync with instant output updates.</li>
+    <li>Letter-frequency bars and the inplace solver help you spot patterns and test guesses quickly.</li>
+    <li>Supports 25+ languages with an editable alphabet that adapts to native characters.</li>
+    <li>Autosolver spacing modes keep, remove, or resegment words depending on the puzzle.</li>
+    <li>Optional partial text and known-letter hints guide the search results.</li>
+    <li>Results table ranks candidates and shows the discovered key and space substitute.</li>
+</ul>
+
+<h2 id="options">Options</h2>
+
+<div class="row gy-2 align-items-start mb-4">
+    <div class="col-sm-4 col-lg-3 fw-semibold">Language</div>
+    <div class="col-sm-8 col-lg-9">Choose the language you know (or believe) the plaintext is written in.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Alphabet</div>
+    <div class="col-sm-8 col-lg-9">The working alphabet for the cipher. It defaults to the selected language's native
+        alphabet. Use the <strong>Original</strong> preset to reset it, <strong>A–Z (26)</strong> for plain Latin, or
+        edit the field directly for a custom alphabet.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Search depth</div>
+    <div class="col-sm-8 col-lg-9">How hard the solver tries. Higher values test more keys but take longer.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Results to keep</div>
+    <div class="col-sm-8 col-lg-9">How many top candidates stay visible in the results list.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Analysis quality</div>
+    <div class="col-sm-8 col-lg-9">Choose <strong>Standard</strong> or <strong>High</strong>. Higher analysis quality improves results, but uses more memory and may not run on memory-limited devices.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Spacing mode</div>
+    <div class="col-sm-8 col-lg-9">Controls how spaces are handled. Set it to <strong>Automatic</strong> to let the
+        autosolver decide. Use <strong>Keep existing spacing</strong> if your spaces are reliable,
+        <strong>Remove spacing</strong> when the text has unreliable spacing, and
+        <strong>Re-segment</strong> to let the solver insert and delete spaces automatically.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Partial text</div>
+    <div class="col-sm-8 col-lg-9">A word or phrase you expect in the plaintext. Matches are boosted in the rankings.
+        Cannot contain wildcards.</div>
+
+    <div class="col-sm-4 col-lg-3 fw-semibold">Known letters</div>
+    <div class="col-sm-8 col-lg-9">Lock in any cipher → plain letter mappings to narrow the search.</div>
+</div>
+
+<h2 id="what-is-substitution-cipher">What is a substitution cipher?</h2>
+<p>
+    In a simple monoalphabetic substitution cipher (the kind used in newspaper cryptograms), every plaintext letter is
+    replaced by a unique ciphertext symbol, and that mapping stays fixed across the entire message. The cipher alphabet
+    can be a shuffled version of the plain alphabet,
+    a reversed order, or something themed to a puzzle (newspaper cryptograms often ban self-mappings). If the original
+    spacing remains, the puzzle is called an <strong>Aristocrat</strong> in ACA terminology. In newspapers the same
+    format often appears as branded puzzles like Cryptoquip or Cryptoquote. When spaces are stripped it is called a
+    <strong>Patristocrat</strong> by ACA.
+</p>
+<p>
+    Example with cipher key <code>QWERTYUIOPASDFGHJKLZXCVBNM</code> (so cipher A→Q, B→W, C→E, etc):</p>
+<pre class="mb-3">
+Plain : SUBSTITUTION CIPHERS ARE FUN
+Cipher: LXWLZOZXZOGF EOHITKL QKT YXF
+</pre>
+<p>
+    To decode, you invert the mapping key: ciphertext <code>Q</code> maps to plaintext <code>A</code>, <code>W</code>
+    maps
+    to <code>B</code>, and so on. Inverting the above example gives: <code>KXVMCNOPHQRSZYIJADLEGWBUFT</code>.
+    You can test decoding by entering the ciphertext and inverted key into the tool above.
+</p>
+
+<h2 id="history">History and facts</h2>
+<p>
+    Simple substitution appears in some of the earliest recorded ciphers, from ancient Hebrew Atbash to Renaissance
+    keyword alphabets. By the 19th century, writers like Edgar Allan Poe were popularising cryptograms in newspapers and
+    magazines. By the early 20th century, the one‑to‑one substitution format had become a familiar daily puzzle.
+    Cryptanalysts broke military substitutions centuries ago using
+    frequency analysis and pattern spotting, but the format remains a great teaching and recreational tool.
+</p>
+<p>
+    The American Cryptogram Association publishes high quality Aristocrat and Patristocrat puzzles. Modern
+    puzzlehunts and escape rooms remix the idea with custom symbols (like Pigpen) or themed alphabets while keeping the
+    core rule: every letter maps consistently to a single partner.
+</p>
+
+<h2 id="usage">Where You’ll Encounter It</h2>
+<p>
+    Substitution ciphers are common in geocaches, ARGs, puzzlehunts, and pen-and-paper cryptograms. To solve them
+    manually, start with letter frequencies, look for repeated patterns (like double letters), and guess high-frequency
+    words such as “THE” or “AND.”
+</p>
+
+
+    <p class="pt-3">
+        <text>See also:</text>
+ <a href="/ciphers" class="content-link">Cipher Tools</a> | <a href="/ciphers/atbash-cipher" class="content-link">Atbash cipher</a> | <a href="/ciphers/caesar-cipher" class="content-link">Caesar cipher</a> | <a href="/ciphers/affine-cipher" class="content-link">Affine cipher</a> | <a href="/ciphers/keyed-caesar-cipher" class="content-link">Keyed Caesar cipher</a> | <a href="/ciphers/rot-n-decoder" class="content-link">ROT-N</a> | <a href="/ciphers/numeric-homophonic-cipher" class="content-link">Numeric homophonic cipher</a>    </p>
+
+            </main>
+
+                <div class="sidebar2">
+                    <div class="sidebar-300"></div>
+                </div>
+
+            <div class="footer-bg"></div>
+<footer class="footer d-lg-flex justify-content-lg-between">
+    <p>
+        &copy; 2026 Johan Åhlén AB. All rights reserved.<br />
+        <span class="footer-meta">
+            Boxentriq Version 2.0.250 · Last update Aug 23, 2026
+        </span>
+    </p>
+    <p>
+        <a href="/resources" class="inherit-link">Resources</a>&nbsp;|
+        <a href="/home/cookiepolicy" class="inherit-link">Cookie Policy</a>&nbsp;|
+        <a href="/home/privacypolicy" class="inherit-link">Privacy Policy</a>&nbsp;|
+        <a href="/home/sitemap" class="inherit-link">Sitemap</a>&nbsp;|
+        <a href="/contact" class="inherit-link" data-q-contact-modal-trigger="true" aria-controls="contactModal" aria-haspopup="dialog">Contact</a>&nbsp;|
+        <a href="/about" class="inherit-link">About</a>
+    </p>
+</footer>
+
+        </div>
+    </div>
+    <template id="iconCopy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></template><template id="iconFolderInput"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/><path d="M2 13h10"/><path d="m9 16 3-3-3-3"/></svg></template><template id="iconDownload"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></template>
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+        <script>
+    !function () { "use strict"; !function (e) { if (-1 === e.cookie.indexOf("__adblocker")) { e.cookie = "__adblocker=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"; var t = new XMLHttpRequest; t.open("GET", "https://www.npttech.com/advertising.js", !0), t.onreadystatechange = function () { if (XMLHttpRequest.DONE === t.readyState) if (200 === t.status) { var n = e.createElement("script"); n.innerHTML = t.responseText, e.getElementsByTagName("head")[0].appendChild(n) } else { var a = new Date; a.setTime(a.getTime() + 3e5), e.cookie = "__adblocker=true; expires=" + a.toUTCString() + "; path=/" } }, t.send() } }(document) }();
+</script>
+<script>
+    !function () { "use strict"; var e; e = document, function () { var t, n; function r() { var t = e.createElement("script"); t.src = "https://cafemedia-com.videoplayerhub.com/galleryplayer.js", e.head.appendChild(t) } function a() { var t = e.cookie.match("(^|[^;]+)\\s*__adblocker\\s*=\\s*([^;]+)"); return t && t.pop() } function c() { clearInterval(n) } return { init: function () { var e; "true" === (t = a()) ? r() : (e = 0, n = setInterval((function () { 100 !== e && "false" !== t || c(), "true" === t && (r(), c()), t = a(), e++ }), 50)) } } }().init() }();
+</script>
+
+</body>
+</html>

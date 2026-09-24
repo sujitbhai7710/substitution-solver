@@ -1,0 +1,13 @@
+{
+  "langCode": "en",
+  "alphabetLetters": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "lowMemory": true,
+  "delimiterMode": 0,
+  "crib": "",
+  "cribWeight": 0.3,
+  "keyTemplate": "",
+  "potentialDelimiterSubstitutes": "X",
+  "numberOfResults": 5,
+  "numberOfRounds": 100,
+  "numberOfSteps": 10000
+}

@@ -1,0 +1,8 @@
+corpus: 13 entries from /home/hatch/workspace/substitution-solver/boxentriq/driver/shards/shard1.json
+harness server: http://127.0.0.1:42815
+initializing boxentriq worker...
+worker initialized in 2945ms
+settings: {"langCode":"en","alphabetLetters":"ABCDEFGHIJKLMNOPQRSTUVWXYZ","lowMemory":true,"delimiterMode":0,"crib":"","cribWeight":0.3,"keyTemplate":"","potentialDelimiterSubstitutes":"X","numberOfResults":5,"numberOfRounds":100,"numberOfSteps":10000}
+[13/13] solved=13 failed=0 skipped=0 elapsed=1063s
+DONE: solved=13 failed=0 skipped=0 total=1062.6s (0.01 puzzles/s)
+results: /home/hatch/workspace/substitution-solver/boxentriq/driver/shards/out1.jsonl

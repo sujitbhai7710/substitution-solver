@@ -1,0 +1,15 @@
+quadgrams.f32 metadata
+source URL: https://raw.githubusercontent.com/vkkkv/subsolve/HEAD/data/english_quadgrams.txt
+source: english_quadgrams.txt (James Lyons / practicalcryptography.com quadgram
+        table, via vkkkv/subsolve GitHub repo data/english_quadgrams.txt; the direct
+        download link on the quadgrams page could not be fetched, so the repo copy
+        was used as the documented fallback)
+date fetched: 2026-09-23
+source lines parsed: 389373
+total quadgram count (sum of counts): 4224127912
+distinct quadgrams seen: 389373
+floor convention (Lyons): ln(0.01 / total) for unseen quadgrams
+floor value: -26.769248851076934
+layout: 26^4 = 456976 little-endian f32 natural-log probabilities,
+        index = ((a*26+b)*26+c)*26+d for uppercase A-Z (a,b,c,d in 0..25)
+byte size: 1827904

@@ -1,0 +1,41 @@
+[package]
+name = "subst-solver"
+version = "0.1.0"
+edition = "2021"
+description = "Fast monoalphabetic substitution-cipher solver (Cryptoquip / Cryptoquote / Celebrity Cipher), native + WASM"
+
+[lib]
+name = "subst_solver"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+rayon = { version = "1", optional = true }
+
+[features]
+parallel = ["rayon"]
+
+[[bin]]
+name = "bench"
+path = "src/bin/bench.rs"
+required-features = ["parallel"]
+
+[[bin]]
+name = "solve_one"
+path = "src/bin/solve_one.rs"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "debuginfo"
+
+# Fast iteration profile for accuracy testing (thin LTO, parallel codegen).
+[profile.dist]
+inherits = "release"
+opt-level = 3
+lto = "thin"
+codegen-units = 16
+panic = "unwind"
+strip = "none"

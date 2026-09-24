@@ -1,0 +1,10 @@
+[
+ [
+  "celebrity-cipher",
+  "celebrity-cipher-answer-from-sep-01-to-06-2025",
+  "https://cryptoquip.net/celebrity-cipher-answer-from-sep-01-to-06-2025/"
+ ],
+ {
+  "note": "skipped broken block 2025-05-15 in https://cryptoquip.net/celebrity-cipher-answer-from-may-12-to-17-2025/ (puzzle_present=False, answer_present=True)"
+ }
+]
