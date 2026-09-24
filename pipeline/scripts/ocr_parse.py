@@ -73,6 +73,7 @@ def _tesseract(path):
             tsv_debug["stderr"] = (r.stderr or "")[:200]
             lines = (r.stdout or "").splitlines()
             tsv_debug["n_lines"] = len(lines)
+            tsv_debug["sample"] = [ln[:100] for ln in lines[1:4]]
             vals = [int(l.split("\t")[10]) for l in lines[1:]
                     if len(l.split("\t")) > 10 and l.split("\t")[10].lstrip("-").isdigit()
                     and int(l.split("\t")[10]) >= 0]
