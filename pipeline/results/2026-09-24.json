@@ -1,6 +1,6 @@
 {
  "date": "2026-09-24",
- "generated_at": "2026-09-24T18:53:01.476854+00:00",
+ "generated_at": "2026-09-24T19:01:27.085782+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -14,17 +14,45 @@
    "solver": {
     "key": "UKRESATOIQZCYHWBVDGMPNLFJX",
     "score": -3848.504,
-    "ms": 2128.2,
+    "ms": 2146.6,
     "restarts": 192,
     "steps": 6000
    },
    "checks": {
     "clue_ok": true,
     "reencode_ok": true,
-    "common_words_ok": true
+    "common_words_ok": true,
+    "word_ratio_ok": false,
+    "ocr_conf_ok": false
    },
-   "needs_review": false,
-   "status": "ok"
+   "needs_review": true,
+   "status": "flagged"
+  },
+  {
+   "type": "cryptoquip",
+   "date": "2026-09-24",
+   "source": "cecildaily",
+   "attribution": "Cryptoquip \u00a9 King Features Syndicate, via Cecil Daily",
+   "teaser": "ZV H FJIMJWB, Z MHD H AZAZF ZKKTMZLV LX H KZBBKJ\u2026",
+   "clue": "Z=I",
+   "ocr_conf": null,
+   "answer": "IV H DJUCJWX, I CHG H AIAID IFFTCILV LZ H FIXXFJ BTU. IX GHC EU CLV ZFWLEH OWJAILTC EIWHBJ. Y \u2019 B : WHEN TWO PEOPLE HAVE VERY GUDDERENT DUNKERPRUNT PATTERNS, UWOMLG KMESS THEY ARE WHORLS APART. T \u2019 B",
+   "solver": {
+    "key": "AXBGEDKHUJFLCNOPQRSTMVWZYI",
+    "score": -5854.782,
+    "ms": 2796.9,
+    "restarts": 192,
+    "steps": 6000
+   },
+   "checks": {
+    "clue_ok": true,
+    "reencode_ok": true,
+    "common_words_ok": true,
+    "word_ratio_ok": false,
+    "ocr_conf_ok": false
+   },
+   "needs_review": true,
+   "status": "flagged"
   },
   {
    "type": "celebrity_cipher",
@@ -38,17 +66,19 @@
    "solver": {
     "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
     "score": -1884.867,
-    "ms": 1726.8,
+    "ms": 1718.2,
     "restarts": 192,
     "steps": 6000
    },
    "checks": {
     "clue_ok": true,
     "reencode_ok": true,
-    "common_words_ok": true
+    "common_words_ok": true,
+    "word_ratio_ok": true,
+    "ocr_conf_ok": false
    },
-   "needs_review": false,
-   "status": "ok"
+   "needs_review": true,
+   "status": "flagged"
   },
   {
    "type": "celebrity_cipher",
@@ -62,17 +92,19 @@
    "solver": {
     "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
     "score": -1951.419,
-    "ms": 1682.4,
+    "ms": 1682.9,
     "restarts": 192,
     "steps": 6000
    },
    "checks": {
     "clue_ok": true,
     "reencode_ok": true,
-    "common_words_ok": true
+    "common_words_ok": true,
+    "word_ratio_ok": true,
+    "ocr_conf_ok": false
    },
-   "needs_review": false,
-   "status": "ok"
+   "needs_review": true,
+   "status": "flagged"
   },
   {
    "type": "celebrity_cipher",
@@ -86,17 +118,34 @@
    "solver": {
     "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
     "score": -1885.961,
-    "ms": 1486.3,
+    "ms": 1483.9,
     "restarts": 192,
     "steps": 6000
    },
    "checks": {
     "clue_ok": true,
     "reencode_ok": true,
-    "common_words_ok": true
+    "common_words_ok": true,
+    "word_ratio_ok": true,
+    "ocr_conf_ok": false
    },
-   "needs_review": false,
-   "status": "ok"
+   "needs_review": true,
+   "status": "flagged"
   }
- ]
+ ],
+ "diagnostics": {
+  "fetch_errors": {},
+  "puzzle_types": [
+   "cryptoquote",
+   "cryptoquip",
+   "celebrity_cipher",
+   "celebrity_cipher",
+   "celebrity_cipher"
+  ],
+  "ocr_conf": {
+   "cryptoquote": null,
+   "cryptoquip": null,
+   "celebrity_cipher": null
+  }
+ }
 }
