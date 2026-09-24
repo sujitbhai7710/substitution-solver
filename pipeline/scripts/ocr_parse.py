@@ -73,7 +73,22 @@ def _tesseract(path):
             tsv_debug["stderr"] = (r.stderr or "")[:200]
             lines = (r.stdout or "").splitlines()
             tsv_debug["n_lines"] = len(lines)
-            tsv_debug["sample"] = [ln[:100] for ln in lines[1:4]]
+            # level histogram + max conf per level to diagnose parsing
+            import collections
+            lvl = collections.Counter()
+            maxc = {}
+            for ln in lines[1:]:
+                f = ln.split("\t")
+                if len(f) > 10:
+                    lvl[f[0]] += 1
+                    try:
+                        cv = int(f[10])
+                    except ValueError:
+                        cv = None
+                    if cv is not None and (f[0] not in maxc or cv > maxc[f[0]]):
+                        maxc[f[0]] = cv
+            tsv_debug["levels"] = dict(lvl)
+            tsv_debug["max_conf_by_level"] = maxc
             vals = [int(l.split("\t")[10]) for l in lines[1:]
                     if len(l.split("\t")) > 10 and l.split("\t")[10].lstrip("-").isdigit()
                     and int(l.split("\t")[10]) >= 0]
