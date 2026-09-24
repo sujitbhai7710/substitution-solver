@@ -143,7 +143,8 @@ def main():
             "reencode_ok": check_reencode(ct, sol.get("plaintext", ""), sol.get("key", "")),
             "common_words_ok": check_common_words(sol.get("plaintext", "")),
             "word_ratio_ok": check_word_ratio(sol.get("plaintext", "")),
-            "ocr_conf_ok": check_ocr_conf(p.get("ocr_conf")),
+            # puzzles with no OCR step (text sources) pass ocr_conf vacuously
+            "ocr_conf_ok": check_ocr_conf(p.get("ocr_conf")) if p.get("asset") else True,
         }
         entry.update({
             "answer": sol["plaintext"],

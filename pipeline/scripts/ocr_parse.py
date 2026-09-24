@@ -64,17 +64,24 @@ def _tesseract(path):
             text = f.read()
         # mean confidence via TSV
         conf = None
+        tsv_debug = {}
         try:
             r = subprocess.run(["tesseract", path, "stdout", "--psm", "6", "-l", "eng", "tsv"],
                                capture_output=True, timeout=300, text=True)
-            vals = [int(l.split("\t")[10]) for l in r.stdout.splitlines()[1:]
+            tsv_debug["rc"] = r.returncode
+            tsv_debug["stdout_len"] = len(r.stdout or "")
+            tsv_debug["stderr"] = (r.stderr or "")[:200]
+            lines = (r.stdout or "").splitlines()
+            tsv_debug["n_lines"] = len(lines)
+            vals = [int(l.split("\t")[10]) for l in lines[1:]
                     if len(l.split("\t")) > 10 and l.split("\t")[10].lstrip("-").isdigit()
                     and int(l.split("\t")[10]) >= 0]
+            tsv_debug["n_words"] = len(vals)
             if vals:
                 conf = round(sum(vals) / len(vals), 1)
-        except Exception:
-            pass
-        return text, conf
+        except Exception as e:
+            tsv_debug["exc"] = f"{type(e).__name__}: {e}"[:200]
+        return text, conf, tsv_debug
     finally:
         for e in (".txt",):
             try:
@@ -89,15 +96,16 @@ def ocr_pdf(path):
     try:
         subprocess.run(["pdftoppm", "-png", "-r", "200", path, os.path.join(tmp, "p")],
                        capture_output=True, timeout=300, check=True)
-        texts, confs = [], []
+        texts, confs, debugs = [], [], []
         for fn in sorted(os.listdir(tmp)):
             if fn.endswith(".png"):
-                t, c = ocr_image(os.path.join(tmp, fn))
+                t, c, dbg = ocr_image(os.path.join(tmp, fn))
                 texts.append(t)
+                debugs.append(dbg)
                 if c is not None:
                     confs.append(c)
         conf = round(sum(confs) / len(confs), 1) if confs else None
-        return "\n".join(texts), conf
+        return "\n".join(texts), conf, debugs
     finally:
         for fn in os.listdir(tmp):
             os.unlink(os.path.join(tmp, fn))
@@ -246,24 +254,26 @@ def main():
     img = man.get("cryptoquote_img")
     if img and os.path.exists(os.path.join(BASE, img) if not os.path.isabs(img) else img):
         p = img if os.path.isabs(img) else os.path.join(BASE, img)
-        text, conf = ocr_image(p)
+        text, conf, dbg = ocr_image(p)
         cipher, yesterday, pdate = parse_cryptoquote_ocr(text)
         puzzles.append({"type": "cryptoquote", "date": day, "ciphertext": cipher,
                         "clue": "", "source": "arkansasonline",
                         "asset": img, "ocr_conf": conf,
                         "printed_date": pdate,
                         "yesterday_answer": yesterday,
-                        "ocr_text": text[:2000]})
+                        "ocr_text": text[:2000],
+                        "ocr_debug": dbg})
 
     pdf = man.get("cryptoquip_pdf")
     if pdf and os.path.exists(pdf if os.path.isabs(pdf) else os.path.join(BASE, pdf)):
         p = pdf if os.path.isabs(pdf) else os.path.join(BASE, pdf)
-        text, conf = ocr_pdf(p)
+        text, conf, dbgs = ocr_pdf(p)
         cipher = parse_cryptoquip_ocr(text)
         puzzles.append({"type": "cryptoquip", "date": day, "ciphertext": cipher,
                         "clue": extract_clue(text), "source": "cecildaily",
                         "asset": pdf, "ocr_conf": conf,
-                        "ocr_text": text[:2000]})
+                        "ocr_text": text[:2000],
+                        "ocr_debug": dbgs})
 
     for c in man.get("celeb_ciphers", []):
         puzzles.append({"type": "celebrity_cipher", "date": c["date"],
