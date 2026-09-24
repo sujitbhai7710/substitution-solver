@@ -1,6 +1,6 @@
 {
  "date": "2026-09-24",
- "generated_at": "2026-09-24T19:09:10.735006+00:00",
+ "generated_at": "2026-09-24T19:10:49.249605+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -14,33 +14,7 @@
    "solver": {
     "key": "IQNESATORJZPDHBGWYUVCMLFXK",
     "score": -1380.78,
-    "ms": 1105.5,
-    "restarts": 192,
-    "steps": 6000
-   },
-   "checks": {
-    "clue_ok": true,
-    "reencode_ok": true,
-    "common_words_ok": true,
-    "word_ratio_ok": true,
-    "ocr_conf_ok": false
-   },
-   "needs_review": true,
-   "status": "flagged"
-  },
-  {
-   "type": "cryptoquip",
-   "date": "2026-09-24",
-   "source": "cecildaily",
-   "attribution": "Cryptoquip \u00a9 King Features Syndicate, via Cecil Daily",
-   "teaser": "ZV H FJIMJWB, Z MHD H AZAZF ZKKTMZLV LX H KZBBKJ\u2026",
-   "clue": "Z=I",
-   "ocr_conf": null,
-   "answer": "IN A DEYSERT, I SAW A VIVID ILLUSION OF A LITTLE GUY. IT WAS MY SON FLROMA PREVIOUS MIRAGE.",
-   "solver": {
-    "key": "VTGWMDHAYELOSZPQXJCUBNRFKI",
-    "score": -1877.526,
-    "ms": 1086.5,
+    "ms": 663.8,
     "restarts": 192,
     "steps": 6000
    },
@@ -66,7 +40,7 @@
    "solver": {
     "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
     "score": -1884.867,
-    "ms": 1634.9,
+    "ms": 975.5,
     "restarts": 192,
     "steps": 6000
    },
@@ -92,7 +66,7 @@
    "solver": {
     "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
     "score": -1951.419,
-    "ms": 1608.4,
+    "ms": 948.3,
     "restarts": 192,
     "steps": 6000
    },
@@ -118,7 +92,7 @@
    "solver": {
     "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
     "score": -1885.961,
-    "ms": 1410.4,
+    "ms": 815.7,
     "restarts": 192,
     "steps": 6000
    },
@@ -134,17 +108,17 @@
   }
  ],
  "diagnostics": {
-  "fetch_errors": {},
+  "fetch_errors": {
+   "cryptoquip": "section page: HTTP Error 429: Too Many Requests"
+  },
   "puzzle_types": [
    "cryptoquote",
-   "cryptoquip",
    "celebrity_cipher",
    "celebrity_cipher",
    "celebrity_cipher"
   ],
   "ocr_conf": {
    "cryptoquote": null,
-   "cryptoquip": null,
    "celebrity_cipher": null
   }
  }
