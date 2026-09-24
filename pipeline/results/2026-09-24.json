@@ -1,0 +1,102 @@
+{
+ "date": "2026-09-24",
+ "generated_at": "2026-09-24T18:53:01.476854+00:00",
+ "puzzles": [
+  {
+   "type": "cryptoquote",
+   "date": "2026-09-24",
+   "source": "arkansasonline",
+   "attribution": "Cryptoquote \u00a9 King Features Syndicate, via Arkansas Democrat-Gazette",
+   "teaser": "AVFPACFGAHC FWWHOE RHS GH ODCM GND ISWDE HX GND \u2026",
+   "clue": "",
+   "ocr_conf": null,
+   "answer": "UNABURATUOR ALLOWS DOG TO WERY THE IGLES OF THE TENCOIAL VOILY. AND SHEIALY J \u2019 R : MW OSCC LIMO RIDRPYGMUHRSG; I RDSUMS WBBWDMPHIMISG. KDDPRS CSS",
+   "solver": {
+    "key": "UKRESATOIQZCYHWBVDGMPNLFJX",
+    "score": -3848.504,
+    "ms": 2128.2,
+    "restarts": 192,
+    "steps": 6000
+   },
+   "checks": {
+    "clue_ok": true,
+    "reencode_ok": true,
+    "common_words_ok": true
+   },
+   "needs_review": false,
+   "status": "ok"
+  },
+  {
+   "type": "celebrity_cipher",
+   "date": "2026-09-24",
+   "source": "cryptoquip.net",
+   "attribution": "Celebrity Cipher by Luis Campos, via cryptoquip.net",
+   "teaser": "T JZXAU LEPKQJ LRWTAI XF PNZOTKP RAU RVNTAI NBK \u2026",
+   "clue": "O=R",
+   "ocr_conf": null,
+   "answer": "I FOUND MYSELF MAKING UP STORIES AND ACTING THE DIFFERENT PARTS, AND THERE\u2019S NOTHING LIKE BOREDOM TO MAKE YOU WRITE.",
+   "solver": {
+    "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
+    "score": -1884.867,
+    "ms": 1726.8,
+    "restarts": 192,
+    "steps": 6000
+   },
+   "checks": {
+    "clue_ok": true,
+    "reencode_ok": true,
+    "common_words_ok": true
+   },
+   "needs_review": false,
+   "status": "ok"
+  },
+  {
+   "type": "celebrity_cipher",
+   "date": "2026-09-25",
+   "source": "cryptoquip.net",
+   "attribution": "Celebrity Cipher by Luis Campos, via cryptoquip.net",
+   "teaser": "V\u2019S JVGW PD XDVOP DTP PD XWDXJW PMW SVKVOW VO B \u2026",
+   "clue": "S=D",
+   "ocr_conf": null,
+   "answer": "I\u2019D LIKE TO POINT OUT TO PEOPLE THE DIVINE IN A MUSICAL LANGUAGE THAT TRANSCENDS WORDS. I WANT TO SPEAK TO THEIR SOULS.",
+   "solver": {
+    "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
+    "score": -1951.419,
+    "ms": 1682.4,
+    "restarts": 192,
+    "steps": 6000
+   },
+   "checks": {
+    "clue_ok": true,
+    "reencode_ok": true,
+    "common_words_ok": true
+   },
+   "needs_review": false,
+   "status": "ok"
+  },
+  {
+   "type": "celebrity_cipher",
+   "date": "2026-09-26",
+   "source": "cryptoquip.net",
+   "attribution": "Celebrity Cipher by Luis Campos, via cryptoquip.net",
+   "teaser": "PZPST ENZOP TNC LN OH HNSY NB F UPFI NB BFOYA \u2026 \u2026",
+   "clue": "B=F",
+   "ocr_conf": null,
+   "answer": "EVERY MOVIE YOU DO IS SORT OF A LEAP OF FAITH \u2026 AND, FOR ME, IT\u2019S JUST ABOUT THE FILMMAKER AND THE MATERIAL.",
+   "solver": {
+    "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
+    "score": -1885.961,
+    "ms": 1486.3,
+    "restarts": 192,
+    "steps": 6000
+   },
+   "checks": {
+    "clue_ok": true,
+    "reencode_ok": true,
+    "common_words_ok": true
+   },
+   "needs_review": false,
+   "status": "ok"
+  }
+ ]
+}
