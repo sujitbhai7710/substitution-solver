@@ -1,6 +1,6 @@
 {
  "date": "2026-09-24",
- "generated_at": "2026-09-24T19:01:27.085782+00:00",
+ "generated_at": "2026-09-24T19:04:30.247011+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -10,11 +10,11 @@
    "teaser": "AVFPACFGAHC FWWHOE RHS GH ODCM GND ISWDE HX GND \u2026",
    "clue": "",
    "ocr_conf": null,
-   "answer": "UNABURATUOR ALLOWS DOG TO WERY THE IGLES OF THE TENCOIAL VOILY. AND SHEIALY J \u2019 R : MW OSCC LIMO RIDRPYGMUHRSG; I RDSUMS WBBWDMPHIMISG. KDDPRS CSS",
+   "answer": "IMAGINATION ALLOBS YOU TO BEND THE RULES OF THE TEMPORAL WORLD. \u2014 AMY SHERALD",
    "solver": {
-    "key": "UKRESATOIQZCYHWBVDGMPNLFJX",
-    "score": -3848.504,
-    "ms": 2146.6,
+    "key": "IQNESATORJZPDHBGWYUVCMLFXK",
+    "score": -1380.78,
+    "ms": 1160.8,
     "restarts": 192,
     "steps": 6000
    },
@@ -22,7 +22,7 @@
     "clue_ok": true,
     "reencode_ok": true,
     "common_words_ok": true,
-    "word_ratio_ok": false,
+    "word_ratio_ok": true,
     "ocr_conf_ok": false
    },
    "needs_review": true,
@@ -36,11 +36,11 @@
    "teaser": "ZV H FJIMJWB, Z MHD H AZAZF ZKKTMZLV LX H KZBBKJ\u2026",
    "clue": "Z=I",
    "ocr_conf": null,
-   "answer": "IV H DJUCJWX, I CHG H AIAID IFFTCILV LZ H FIXXFJ BTU. IX GHC EU CLV ZFWLEH OWJAILTC EIWHBJ. Y \u2019 B : WHEN TWO PEOPLE HAVE VERY GUDDERENT DUNKERPRUNT PATTERNS, UWOMLG KMESS THEY ARE WHORLS APART. T \u2019 B",
+   "answer": "IN A DEYSERT, I SAW A VIVID ILLUSION OF A LITTLE GUY. IT WAS MY SON FLROMA PREVIOUS MIRAGE.",
    "solver": {
-    "key": "AXBGEDKHUJFLCNOPQRSTMVWZYI",
-    "score": -5854.782,
-    "ms": 2796.9,
+    "key": "VTGWMDHAYELOSZPQXJCUBNRFKI",
+    "score": -1877.526,
+    "ms": 1158.9,
     "restarts": 192,
     "steps": 6000
    },
@@ -48,7 +48,7 @@
     "clue_ok": true,
     "reencode_ok": true,
     "common_words_ok": true,
-    "word_ratio_ok": false,
+    "word_ratio_ok": true,
     "ocr_conf_ok": false
    },
    "needs_review": true,
@@ -66,7 +66,7 @@
    "solver": {
     "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
     "score": -1884.867,
-    "ms": 1718.2,
+    "ms": 1723.7,
     "restarts": 192,
     "steps": 6000
    },
@@ -92,7 +92,7 @@
    "solver": {
     "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
     "score": -1951.419,
-    "ms": 1682.9,
+    "ms": 1759.6,
     "restarts": 192,
     "steps": 6000
    },
@@ -118,7 +118,7 @@
    "solver": {
     "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
     "score": -1885.961,
-    "ms": 1483.9,
+    "ms": 1527.8,
     "restarts": 192,
     "steps": 6000
    },
