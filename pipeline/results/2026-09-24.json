@@ -1,6 +1,6 @@
 {
  "date": "2026-09-24",
- "generated_at": "2026-09-24T19:04:30.247011+00:00",
+ "generated_at": "2026-09-24T19:07:09.958498+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -14,7 +14,7 @@
    "solver": {
     "key": "IQNESATORJZPDHBGWYUVCMLFXK",
     "score": -1380.78,
-    "ms": 1160.8,
+    "ms": 1211.2,
     "restarts": 192,
     "steps": 6000
    },
@@ -40,7 +40,7 @@
    "solver": {
     "key": "VTGWMDHAYELOSZPQXJCUBNRFKI",
     "score": -1877.526,
-    "ms": 1158.9,
+    "ms": 1202.0,
     "restarts": 192,
     "steps": 6000
    },
@@ -66,7 +66,7 @@
    "solver": {
     "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
     "score": -1884.867,
-    "ms": 1723.7,
+    "ms": 1827.8,
     "restarts": 192,
     "steps": 6000
    },
@@ -75,10 +75,10 @@
     "reencode_ok": true,
     "common_words_ok": true,
     "word_ratio_ok": true,
-    "ocr_conf_ok": false
+    "ocr_conf_ok": true
    },
-   "needs_review": true,
-   "status": "flagged"
+   "needs_review": false,
+   "status": "ok"
   },
   {
    "type": "celebrity_cipher",
@@ -92,7 +92,7 @@
    "solver": {
     "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
     "score": -1951.419,
-    "ms": 1759.6,
+    "ms": 1761.5,
     "restarts": 192,
     "steps": 6000
    },
@@ -101,10 +101,10 @@
     "reencode_ok": true,
     "common_words_ok": true,
     "word_ratio_ok": true,
-    "ocr_conf_ok": false
+    "ocr_conf_ok": true
    },
-   "needs_review": true,
-   "status": "flagged"
+   "needs_review": false,
+   "status": "ok"
   },
   {
    "type": "celebrity_cipher",
@@ -118,7 +118,7 @@
    "solver": {
     "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
     "score": -1885.961,
-    "ms": 1527.8,
+    "ms": 1548.2,
     "restarts": 192,
     "steps": 6000
    },
@@ -127,10 +127,10 @@
     "reencode_ok": true,
     "common_words_ok": true,
     "word_ratio_ok": true,
-    "ocr_conf_ok": false
+    "ocr_conf_ok": true
    },
-   "needs_review": true,
-   "status": "flagged"
+   "needs_review": false,
+   "status": "ok"
   }
  ],
  "diagnostics": {
