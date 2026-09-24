@@ -58,6 +58,6 @@ jobs:
         with:
           name: pipeline-debug-${{ github.run_id }}
           path: |
-            /tmp/puzzle_manifest.json
+            /tmp/manifest.json
             /tmp/puzzles.json
           retention-days: 7

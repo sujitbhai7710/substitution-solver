@@ -188,7 +188,7 @@ def parse_cryptoquote_ocr(text):
     OCR-mangled we still pick only long uppercase runs, so mixed-case
     instruction text can never leak into the cipher.
     """
-    head = re.split(r"yesterday'?s cryptoquote", text, flags=re.I)[0]
+    head = re.split(r"yesterday['’ʼ]?s cryptoquote", text, flags=re.I)[0]
     if re.search(r"cryptoquote", head, re.I):
         seg, author_cipher = cipher_block_after(head, r"cryptoquote")
         cipher = despace_cipher(seg)
@@ -208,7 +208,7 @@ def parse_cryptoquote_ocr(text):
     if dm:
         pdate = (int(dm.group(1)), int(dm.group(2)))
     yesterday = None
-    m = re.search(r"yesterday'?s cryptoquote\s*:\s*(.+?)(?:—|--|–)\s*([A-Z][A-Z .'\-]+)\s*$",
+    m = re.search(r"yesterday['’ʼ]?s cryptoquote\s*:?\s*(.+?)(?:—|--|–)\s*~?\s*([A-Z][A-Z .'’~\-]+?)\s*$",
                   text, re.I | re.S)
     if m:
         yesterday = {"answer": norm_ws(m.group(1)), "author": norm_ws(m.group(2))}
@@ -225,12 +225,12 @@ def parse_cryptoquip_ocr(text):
     answer is already-solved PLAINTEXT and must never enter the cipher)."""
     seg, _ = cipher_block_after(text, r"cryptoquip")
     seg = re.split(
-        r"yesterday'?s\s+cryptoquip"
-        r"|today'?s\s+cryptoquip\s+clue"
+        r"yesterday['’ʼ]?s\s+cryptoquip"
+        r"|today['’ʼ]?s\s+cryptoquip\s+clue"
         r"|the\s+cryptoquip\s+is\s+a\s+substitution",
         seg, flags=re.I)[0]
     # drop any residual clue line, both "Z=I" and "Z equals I" wordings
-    seg = re.sub(r"(?:today'?s\s+)?clue\s*[:\-]?\s*[A-Z]\s*(?:=|equals)\s*[A-Z]",
+    seg = re.sub(r"(?:today['’ʼ]?s\s+)?clue\s*[:\-]?\s*[A-Z]\s*(?:=|equals)\s*[A-Z]",
                  " ", seg, flags=re.I)
     cipher = despace_cipher(seg)
     cipher = re.sub(r"[^A-Z'’.,;:\-?!()\"“”/ ]", " ", cipher)
