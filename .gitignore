@@ -8,3 +8,4 @@ scratch/
 .DS_Store
 boxentriq/data*
 boxentriq/*.wasm
+pipeline/assets/

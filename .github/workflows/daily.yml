@@ -29,7 +29,7 @@ jobs:
 
       - name: Fetch puzzle assets
         run: |
-          pip install --quiet beautifulsoup4 2>/dev/null || true
+          pip install --quiet beautifulsoup4 pillow 2>/dev/null || true
           python3 pipeline/scripts/fetch.py > /tmp/manifest.json
           cat /tmp/manifest.json
 

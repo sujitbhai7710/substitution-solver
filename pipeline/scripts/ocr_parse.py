@@ -26,7 +26,35 @@ BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 
 def ocr_image(path):
-    """Run tesseract on an image file; return (text, mean_conf)."""
+    """Run tesseract on an image file; return (text, mean_conf).
+
+    Newspaper thumbnails (e.g. 304px wide) OCR badly; upscale small images
+    first so tesseract sees ~1200px-wide text.
+    """
+    use_path, tmp_big = path, None
+    try:
+        from PIL import Image
+        im = Image.open(path)
+        w, h = im.size
+        if w < 900:
+            s = 1200.0 / w
+            im = im.resize((int(w * s), int(h * s)), Image.LANCZOS)
+            tmp_big = path + ".big.png"
+            im.save(tmp_big)
+            use_path = tmp_big
+    except Exception:
+        pass
+    try:
+        return _tesseract(use_path)
+    finally:
+        if tmp_big:
+            try:
+                os.unlink(tmp_big)
+            except OSError:
+                pass
+
+
+def _tesseract(path):
     with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as tf:
         out_base = tf.name[:-4]
     try:
@@ -81,29 +109,38 @@ def norm_ws(s):
 
 
 def extract_clue(text):
-    m = re.search(r"(?:clue|today'?s clue)\s*[:\-]?\s*([A-Z])\s*=\s*([A-Z])", text, re.I)
+    # Ignore the how-to-play instructions ("X equals O" example): the clue
+    # always sits before them. (Yesterday's block is kept: on the Cecil sheet
+    # the clue line comes AFTER yesterday's answer.)
+    head = re.split(r"the\s+cryptoquip\s+is\s+a\s+substitution",
+                    text, flags=re.I)[0]
+    m = re.search(r"clue\s*[:\-]?\s*([A-Z])\s*(?:=|equals)\s*([A-Z])", head, re.I)
     if m:
         return f"{m.group(1).upper()}={m.group(2).upper()}"
-    m = re.search(r"\b([A-Z])\s*=\s*([A-Z])\b", text)
+    m = re.search(r"\b([A-Z])\s*=\s*([A-Z])\b", head)
     return f"{m.group(1)}={m.group(2)}" if m else ""
 
 
-def cipher_runs(text, min_len=30):
-    """Long mostly-uppercase runs = ciphertext candidates."""
+def cipher_runs(text, min_len=30, keep_ws=False):
+    """Long mostly-uppercase runs = ciphertext candidates, in document order.
+    keep_ws preserves newlines/multiple spaces (needed by despace_cipher)."""
     cands = []
     for m in re.finditer(r"[A-Z][A-Z'’‘.,;:\-?!()\"“”/ ]{25,}", text):
-        s = norm_ws(m.group(0)).strip(" .,;:-")
+        s = m.group(0) if keep_ws else norm_ws(m.group(0))
+        s = s.strip(" .,;:-")
         letters = sum(c.isalpha() for c in s)
         if len(s) >= min_len and letters >= 15 and \
            sum(c.isupper() for c in s if c.isalpha()) / letters > 0.85:
-            cands.append(s)
-    # longest first, de-dupe substrings
-    cands.sort(key=len, reverse=True)
+            cands.append((m.start(), s))
+    # de-dupe substrings (longest first), then restore document order —
+    # word order matters for solving, so never sort by length.
+    cands.sort(key=lambda c: len(c[1]), reverse=True)
     out = []
-    for c in cands:
-        if not any(c in o or o in c for o in out):
-            out.append(c)
-    return out
+    for _, s in cands:
+        if not any(s in o or o in s for _, o in out):
+            out.append((_, s))
+    out.sort(key=lambda c: c[0])
+    return [s for _, s in out]
 
 
 def despace_cipher(block):
@@ -113,17 +150,21 @@ def despace_cipher(block):
     words = re.split(r"(?: {2,}|\n|\r)+", block)
     out = []
     for w in words:
-        toks = w.split()
+        if not w.strip():
+            continue
+        # set trailing/leading punctuation aside: "Q F F," -> core "Q F F"
+        pm = re.match(r"^(.*?)([.,;:!?\"'’‘()—–-]+)$", w.strip())
+        core, punct = (pm.group(1), pm.group(2)) if pm else (w, "")
+        toks = core.split()
         if len(toks) > 1 and all(len(t) == 1 and t.isupper() for t in toks):
-            out.append("".join(toks))
+            out.append("".join(toks) + punct)
             continue
         # stray detached edge letter: "A VFPACFGAHC" -> "AVFPACFGAHC"
         if len(toks) > 2 and len(toks[0]) == 1 and toks[0].isupper():
             toks = ["".join(toks[:2])] + toks[2:]
         if len(toks) > 2 and len(toks[-1]) == 1 and toks[-1].isupper():
             toks = toks[:-2] + ["".join(toks[-2:])]
-        if w.strip():
-            out.append(" ".join(toks) if toks else "")
+        out.append((" ".join(toks) if toks else "") + punct)
     return " ".join(o for o in out if o)
 
 
@@ -141,10 +182,23 @@ def cipher_block_after(head, marker_re):
 
 def parse_cryptoquote_ocr(text):
     """Ciphertext block sits between the CRYPTOQUOTE header and the encrypted
-    author attribution; Yesterday's answer tail is kept for verification."""
+    author attribution; Yesterday's answer tail is kept for verification.
+
+    Junk guards: instructions/sample sit above the header; if the header is
+    OCR-mangled we still pick only long uppercase runs, so mixed-case
+    instruction text can never leak into the cipher.
+    """
     head = re.split(r"yesterday'?s cryptoquote", text, flags=re.I)[0]
-    seg, author_cipher = cipher_block_after(head, r"cryptoquote")
-    cipher = despace_cipher(seg)
+    if re.search(r"cryptoquote", head, re.I):
+        seg, author_cipher = cipher_block_after(head, r"cryptoquote")
+        cipher = despace_cipher(seg)
+    else:
+        # header OCR-mangled: fall back to long uppercase runs only, so the
+        # mixed-case instructions/sample ("AXYDLBAAXR is LONGFELLOW") can
+        # never leak into the cipher. Spacing is preserved for despace.
+        seg = "\n".join(cipher_runs(head, keep_ws=True))
+        author_cipher = ""
+        cipher = despace_cipher(seg)
     # sanity: keep only plausible cipher text (mostly uppercase)
     cipher = re.sub(r"[^A-Z'’.,;:\-?!()\"“”/ ]", " ", cipher)
     cipher = norm_ws(cipher)
@@ -159,14 +213,25 @@ def parse_cryptoquote_ocr(text):
     if m:
         yesterday = {"answer": norm_ws(m.group(1)), "author": norm_ws(m.group(2))}
     if author_cipher:
+        author_cipher = norm_ws(despace_cipher(
+            re.sub(r"[^A-Z'’.,;:\-?!()\"“”/ ]", " ", author_cipher)))
         cipher = (cipher + " — " + author_cipher).strip()
     return cipher, yesterday, pdate
 
 
 def parse_cryptoquip_ocr(text):
+    """Ciphertext sits right under the CRYPTOQUIP header. Everything after the
+    Yesterday's-answer / clue / how-to-play markers is junk (the yesterday
+    answer is already-solved PLAINTEXT and must never enter the cipher)."""
     seg, _ = cipher_block_after(text, r"cryptoquip")
-    # drop the clue line from the cipher text
-    seg = re.sub(r"(?:today'?s\s+)?clue\s*[:\-]?\s*[A-Z]\s*=\s*[A-Z]", " ", seg, flags=re.I)
+    seg = re.split(
+        r"yesterday'?s\s+cryptoquip"
+        r"|today'?s\s+cryptoquip\s+clue"
+        r"|the\s+cryptoquip\s+is\s+a\s+substitution",
+        seg, flags=re.I)[0]
+    # drop any residual clue line, both "Z=I" and "Z equals I" wordings
+    seg = re.sub(r"(?:today'?s\s+)?clue\s*[:\-]?\s*[A-Z]\s*(?:=|equals)\s*[A-Z]",
+                 " ", seg, flags=re.I)
     cipher = despace_cipher(seg)
     cipher = re.sub(r"[^A-Z'’.,;:\-?!()\"“”/ ]", " ", cipher)
     return norm_ws(cipher)

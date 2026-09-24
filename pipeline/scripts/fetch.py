@@ -24,6 +24,7 @@ import re
 import sys
 import urllib.request
 from datetime import datetime, timedelta
+from html import unescape
 
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"}
@@ -98,6 +99,7 @@ def fetch_celebrity_ciphers():
     text = re.sub(r"<script[\s\S]*?</script>", " ", html)
     text = re.sub(r"<style[\s\S]*?</style>", " ", text)
     text = re.sub(r"<[^>]+>", "\n", text)
+    text = unescape(text)  # &#8220; -> " etc., else ciphertext keeps raw entities
     text = re.sub(r"[ \t]+", " ", text)
     lines = [l.strip() for l in text.split("\n") if l.strip()]
     out = []
