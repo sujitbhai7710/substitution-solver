@@ -7,9 +7,6 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   solve-and-publish:
     runs-on: ubuntu-latest
@@ -52,3 +49,12 @@ jobs:
           git diff --cached --quiet || git commit -m "daily answers $(date -u +%F)"
           git push
 
+      - name: Upload pipeline debug files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-debug-${{ github.run_id }}
+          path: |
+            /tmp/puzzle_manifest.json
+            /tmp/puzzles.json
+          retention-days: 7

@@ -272,7 +272,8 @@ def main():
                         "source": "cryptoquip.net", "asset": None,
                         "ocr_conf": None})
 
-    print(json.dumps({"date": day, "puzzles": puzzles}, indent=1))
+    print(json.dumps({"date": day, "puzzles": puzzles,
+                       "fetch_errors": man.get("errors", {})}, indent=1))
 
 
 if __name__ == "__main__":

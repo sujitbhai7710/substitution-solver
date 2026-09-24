@@ -22,6 +22,12 @@ BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 COMMON = {"THE", "AND", "OF", "TO", "A", "IN", "IS", "IT", "YOU", "THAT",
           "HE", "WAS", "FOR", "ON", "ARE", "AS", "WITH", "HIS", "THEY", "I"}
 
+DICT = set()
+_dict_path = os.path.join(BASE, "data", "words.txt")
+if os.path.exists(_dict_path):
+    with open(_dict_path) as f:
+        DICT = {w.strip().upper() for w in f if w.strip()}
+
 SOURCE_ATTR = {
     "cryptoquote": "Cryptoquote © King Features Syndicate, via Arkansas Democrat-Gazette",
     "cryptoquip": "Cryptoquip © King Features Syndicate, via Cecil Daily",
@@ -74,6 +80,28 @@ def check_common_words(plaintext):
     return len(words & COMMON) >= 2
 
 
+def check_word_ratio(plaintext, min_ratio=0.65):
+    """Most solved body words (len>=3) must be real English words.
+
+    Catches garbage-in/garbage-out: bad OCR decodes to non-words even when
+    clue/reencode/common-words checks pass. Attribution (after -- or em dash)
+    is excluded since names aren't in the dictionary.
+    """
+    if not DICT:
+        return True
+    body = re.split(r"\s+—\s*|\s+--\s*|\s+-\s+(?=[A-Z][A-Z ]+$)", plaintext)[0]
+    words = [w for w in re.findall(r"[A-Za-z]+", body.upper()) if len(w) >= 3]
+    if not words:
+        return False
+    hits = sum(1 for w in words if w in DICT)
+    return (hits / len(words)) >= min_ratio
+
+
+def check_ocr_conf(ocr_conf, min_conf=50.0):
+    """Tesseract mean word confidence must exist and clear a floor."""
+    return ocr_conf is not None and ocr_conf >= min_conf
+
+
 def teaser(ciphertext, n=48):
     t = re.sub(r"\s+", " ", ciphertext).strip()
     return (t[:n] + "…") if len(t) > n else t
@@ -114,6 +142,8 @@ def main():
             "clue_ok": check_clue(p.get("clue", ""), sol.get("key", "")),
             "reencode_ok": check_reencode(ct, sol.get("plaintext", ""), sol.get("key", "")),
             "common_words_ok": check_common_words(sol.get("plaintext", "")),
+            "word_ratio_ok": check_word_ratio(sol.get("plaintext", "")),
+            "ocr_conf_ok": check_ocr_conf(p.get("ocr_conf")),
         }
         entry.update({
             "answer": sol["plaintext"],
@@ -128,7 +158,12 @@ def main():
 
     out = {"date": day,
            "generated_at": datetime.now(timezone.utc).isoformat(),
-           "puzzles": results}
+           "puzzles": results,
+           "diagnostics": {
+               "fetch_errors": data.get("fetch_errors", {}),
+               "puzzle_types": [r["type"] for r in results],
+               "ocr_conf": {r["type"]: r.get("ocr_conf") for r in results},
+           }}
     os.makedirs(os.path.join(BASE, "results"), exist_ok=True)
     op = os.path.join(BASE, "results", f"{day}.json")
     with open(op, "w") as f:
