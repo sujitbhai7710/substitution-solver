@@ -58,25 +58,55 @@ def fetch_cryptoquote(day):
         return None, f"{url}: {e}"
 
 
+def article_published_date(ahtml):
+    """Extract YYYY-MM-DD published date from article HTML (BLOX/TownNews meta)."""
+    pats = [
+        r'<meta[^>]+property="article:published_time"[^>]+content="([^"]+)"',
+        r'<meta[^>]+content="([^"]+)"[^>]+property="article:published_time"',
+        r'"datePublished"\s*:\s*"([^"]+)"',
+        r'<time[^>]+datetime="([^"]+)"',
+        r'<meta[^>]+name="publish-date"[^>]+content="([^"]+)"',
+    ]
+    for pat in pats:
+        m = re.search(pat, ahtml, re.I)
+        if m:
+            dm = re.match(r"(\d{4})-(\d{2})-(\d{2})", m.group(1))
+            if dm:
+                return f"{dm.group(1)}-{dm.group(2)}-{dm.group(3)}"
+    return None
+
+
 def fetch_cryptoquip(day):
-    """Cecil Daily: section page -> latest /diversions/cryptoquip/ article -> PDF href."""
+    """Cecil Daily: section page -> article published ON `day` -> PDF href.
+
+    Never mislabel: only accept an article whose published date matches the
+    target day. If the day's article isn't out yet, fail with an error instead
+    of silently attaching a different day's PDF.
+    Returns (pdf_path, error, info_dict)."""
+    want = day.strftime("%Y-%m-%d")
     try:
         html = get("https://www.cecildaily.com/diversions/cryptoquip/").decode("utf-8", "replace")
     except Exception as e:
-        return None, f"section page: {e}"
+        return None, f"section page: {e}", {}
     arts = sorted(set(
         m.group(1) for m in
         re.finditer(r'href="((?:https://www\.cecildaily\.com)?/diversions/cryptoquip/[^"]+)"', html)
         if m.group(1).rstrip("/") != "/diversions/cryptoquip"
     ))
     if not arts:
-        return None, "no article links found on section page"
-    # latest article first (BLOX lists newest first; try each until a PDF is found)
+        return None, "no article links found on section page", {}
+    seen = []
+    # newest first (BLOX lists newest first); take the first article dated `want`
     for art in arts[:6]:
         url = art if art.startswith("http") else "https://www.cecildaily.com" + art
         try:
             ahtml = get(url).decode("utf-8", "replace")
         except Exception:
+            continue
+        pub = article_published_date(ahtml)
+        if pub and pub not in seen:
+            seen.append(pub)
+        if pub != want:
             continue
         pdfs = re.findall(r'href="([^"]+\.pdf[^"]*)"', ahtml, re.I)
         if pdfs:
@@ -84,10 +114,13 @@ def fetch_cryptoquip(day):
                 ("https://www.cecildaily.com" + pdfs[0] if pdfs[0].startswith("/") else pdfs[0])
             try:
                 data = get(pdf)
-                return save(f"{day:%Y-%m-%d}_cryptoquip.pdf", data), None
+                return save(f"{day:%Y-%m-%d}_cryptoquip.pdf", data), None, \
+                    {"article": url, "article_date": pub}
             except Exception as e:
-                return None, f"pdf download {pdf}: {e}"
-    return None, f"no PDF in first {min(6, len(arts))} articles"
+                return None, f"pdf download {pdf}: {e}", {"article": url, "article_date": pub}
+    if seen:
+        return None, f"no cryptoquip article published for {want} (seen: {sorted(seen)[:4]})", {}
+    return None, f"no PDF in first {min(6, len(arts))} articles (no parseable dates)", {}
 
 
 def fetch_celebrity_ciphers():
@@ -152,8 +185,10 @@ def main():
     if err:
         manifest["errors"]["cryptoquote"] = err
 
-    pdf, err = fetch_cryptoquip(day)
+    pdf, err, info = fetch_cryptoquip(day)
     manifest["cryptoquip_pdf"] = pdf
+    manifest["cryptoquip_article"] = info.get("article")
+    manifest["cryptoquip_article_date"] = info.get("article_date")
     if err:
         manifest["errors"]["cryptoquip"] = err
 
