@@ -73,25 +73,34 @@ def _tesseract(path):
             tsv_debug["stderr"] = (r.stderr or "")[:200]
             lines = (r.stdout or "").splitlines()
             tsv_debug["n_lines"] = len(lines)
-            # level histogram + max conf per level to diagnose parsing
+            # level histogram + max conf per level to diagnose parsing.
+            # NOTE: tesseract's conf column is DECIMAL text (e.g. "95.12"), so
+            # parse as float; int()/isdigit() silently drops every value.
             import collections
             lvl = collections.Counter()
             maxc = {}
+            def _conf(s):
+                try:
+                    return float(s)
+                except (ValueError, TypeError):
+                    return None
             for ln in lines[1:]:
                 f = ln.split("\t")
                 if len(f) > 10:
                     lvl[f[0]] += 1
-                    try:
-                        cv = int(f[10])
-                    except ValueError:
-                        cv = None
+                    cv = _conf(f[10])
                     if cv is not None and (f[0] not in maxc or cv > maxc[f[0]]):
                         maxc[f[0]] = cv
             tsv_debug["levels"] = dict(lvl)
             tsv_debug["max_conf_by_level"] = maxc
-            vals = [int(l.split("\t")[10]) for l in lines[1:]
-                    if len(l.split("\t")) > 10 and l.split("\t")[10].lstrip("-").isdigit()
-                    and int(l.split("\t")[10]) >= 0]
+            # word-level (level 5) confidence: mean of non-negative values
+            vals = []
+            for ln in lines[1:]:
+                f = ln.split("\t")
+                if len(f) > 10 and f[0].strip() == "5":
+                    cv = _conf(f[10])
+                    if cv is not None and cv >= 0:
+                        vals.append(cv)
             tsv_debug["n_words"] = len(vals)
             if vals:
                 conf = round(sum(vals) / len(vals), 1)
