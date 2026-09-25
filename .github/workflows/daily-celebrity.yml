@@ -76,7 +76,7 @@ jobs:
           fi
 
       - name: Deploy site to Cloudflare Pages
-        if: success()
+        if: success() && secrets.CLOUDFLARE_PAGES_TOKEN != ''
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
