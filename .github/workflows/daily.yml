@@ -52,6 +52,26 @@ jobs:
           git diff --cached --quiet || git commit -m "daily answers $(date -u +%F)"
           git push
 
+      - name: Render static answers page
+        run: |
+          DAY=$(date -u +%F)
+          if [ -f pipeline/results/$DAY.json ]; then
+            python3 pipeline/scripts/render_answers_page.py pipeline/results/$DAY.json current-site/
+            git config user.name "puzzle-bot"
+            git config user.email "puzzle-bot@users.noreply.github.com"
+            git add current-site/answers/ current-site/index.html || true
+            git diff --cached --quiet || git commit -m "answers page $DAY" && git push || true
+          else
+            echo "no results for $DAY, skipping page render"
+          fi
+
+      - name: Deploy site to Cloudflare Pages
+        if: success()
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          command: pages deploy current-site --project-name=substitution-cipher --commit-dirty=true
+
       - name: Upload pipeline debug files
         if: always()
         uses: actions/upload-artifact@v4

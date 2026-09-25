@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Puzzle Answers — 2026-09-25 · Substitution Cipher Solver</title>
+  <meta name="description" content="Solved answers for today's Cryptoquote, Cryptoquip and Celebrity Cipher, decoded by our own solver.">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <style>
+    .answer-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; }
+    .archive-card { cursor: default; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="../">
+        <i class="bi bi-shuffle text-primary"></i>
+        <span class="fw-semibold">Substitution Cipher</span>
+      </a>
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <a class="btn btn-sm btn-outline-primary" href="../">Solver</a>
+        <button class="btn btn-sm btn-outline-secondary" id="themeToggle" title="Toggle theme">
+          <i class="bi bi-moon-stars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <header class="mb-4">
+      <h1 class="h3">Daily Answers <span class="text-secondary fs-6">· 2026-09-25</span></h1>
+      <p class="text-secondary mb-0">
+        Every answer below was decoded from the original publisher puzzle by our own
+        solver — never copied from answer sites. Only answers that pass all automatic
+        checks are published.
+      </p>
+    </header>
+
+    <section id="today">
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <h2 class="h5 m-0 me-auto">Cryptoquote</h2>
+            <span class="badge text-bg-secondary">Arkansas Democrat-Gazette</span>
+          </div>
+          <p class="text-secondary small mb-1"><em>DWNHB GYFF ZI QFF, CY EQDNYHD GNDW QFF, QHO DPM …&hellip;</em></p>
+          <p class="answer-text mb-0">THINK WELL OF ALL, BE PATIENT WITH ALL, AND TRY TO FIND THE GOOD IN ALL. — MUHAMMAD ALI</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <h2 class="h5 m-0 me-auto">Celebrity Cipher</h2>
+            <span class="badge text-bg-secondary">cryptoquip.net</span><span class="badge text-bg-info ms-2">Clue: O=R</span>
+          </div>
+          <p class="text-secondary small mb-1"><em>T JZXAU LEPKQJ LRWTAI XF PNZOTKP RAU RVNTAI NBK …&hellip;</em></p>
+          <p class="answer-text mb-0">I FOUND MYSELF MAKING UP STORIES AND ACTING THE DIFFERENT PARTS, AND THERE’S NOTHING LIKE BOREDOM TO MAKE YOU WRITE.</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <h2 class="h5 m-0 me-auto">Celebrity Cipher</h2>
+            <span class="badge text-bg-secondary">cryptoquip.net</span><span class="badge text-bg-info ms-2">Clue: S=D</span>
+          </div>
+          <p class="text-secondary small mb-1"><em>V’S JVGW PD XDVOP DTP PD XWDXJW PMW SVKVOW VO B …&hellip;</em></p>
+          <p class="answer-text mb-0">I’D LIKE TO POINT OUT TO PEOPLE THE DIVINE IN A MUSICAL LANGUAGE THAT TRANSCENDS WORDS. I WANT TO SPEAK TO THEIR SOULS.</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <h2 class="h5 m-0 me-auto">Celebrity Cipher</h2>
+            <span class="badge text-bg-secondary">cryptoquip.net</span><span class="badge text-bg-info ms-2">Clue: B=F</span>
+          </div>
+          <p class="text-secondary small mb-1"><em>PZPST ENZOP TNC LN OH HNSY NB F UPFI NB BFOYA … …&hellip;</em></p>
+          <p class="answer-text mb-0">EVERY MOVIE YOU DO IS SORT OF A LEAP OF FAITH … AND, FOR ME, IT’S JUST ABOUT THE FILMMAKER AND THE MATERIAL.</p>
+        </div>
+      </div></section>
+
+    <section class="mt-5">
+      <h2 class="h4 mb-3"><i class="bi bi-calendar3"></i> Answer archive</h2>
+      <p class="text-secondary">Pick any past date to look up its answers from the archive.</p>
+      <div class="row g-2 align-items-end mb-3" style="max-width: 480px">
+        <div class="col">
+          <label for="arcDate" class="form-label small">Date</label>
+          <input type="date" id="arcDate" class="form-control" max="2026-09-25">
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-primary" id="arcGo">Look up</button>
+        </div>
+      </div>
+      <div id="arcResult"></div>
+    </section>
+
+    <footer class="mt-5 pt-3 border-top text-secondary small">
+      Cryptoquote &amp; Cryptoquip &copy; King Features Syndicate ·
+      Celebrity Cipher by Luis Campos · Answers computed by the substitution-cipher autosolver.
+    </footer>
+  </main>
+
+  <script>
+    const API = "https://puzzle-answers.avm-studio-video.workers.dev";
+    const label = t => ({cryptoquote:"Cryptoquote",cryptoquip:"Cryptoquip",celebrity_cipher:"Celebrity Cipher"})[t] || t;
+    document.getElementById("arcGo").addEventListener("click", async () => {
+      const d = document.getElementById("arcDate").value;
+      const box = document.getElementById("arcResult");
+      if (!d) { box.innerHTML = '<div class="alert alert-warning">Pick a date first.</div>'; return; }
+      box.innerHTML = '<div class="spinner-border spinner-border-sm"></div> Loading…';
+      try {
+        const r = await fetch(API + "/answers?date=" + encodeURIComponent(d));
+        if (!r.ok) throw new Error("not found");
+        const j = await r.json();
+        const ps = (j.puzzles || []).filter(p => (p.status || "ok") === "ok" && !p.needs_review && p.answer);
+        if (!ps.length) { box.innerHTML = '<div class="alert alert-info">No verified answers archived for ' + d + '.</div>'; return; }
+        box.innerHTML = ps.map(p => `
+          <div class="card shadow-sm mb-3 archive-card"><div class="card-body">
+            <h3 class="h6">${label(p.type)}</h3>
+            <p class="answer-text mb-0">${p.answer.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</p>
+          </div></div>`).join("");
+      } catch (e) {
+        box.innerHTML = '<div class="alert alert-warning">Could not load answers for ' + d + '.</div>';
+      }
+    });
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const h = document.documentElement;
+      h.dataset.bsTheme = h.dataset.bsTheme === "light" ? "dark" : "light";
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
