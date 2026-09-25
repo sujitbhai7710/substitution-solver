@@ -40,6 +40,12 @@ TYPE_SOURCE = {
     "celebrity_cipher": "cryptoquip.net",
 }
 
+TYPE_SOURCE_URL = {
+    "cryptoquote": "https://www.arkansasonline.com/puzzles/quote/",
+    "cryptoquip": "https://www.cecildaily.com/diversions/cryptoquip/",
+    "celebrity_cipher": "https://www.cryptoquip.net/todays-celebrity-cipher-answer/",
+}
+
 TYPE_BLURB = {
     "cryptoquote": "Cryptoquote &copy; King Features Syndicate, via Arkansas Democrat-Gazette.",
     "cryptoquip": "Cryptoquip &copy; King Features Syndicate, via Cecil Daily.",
@@ -132,6 +138,9 @@ def answer_card(p):
     """Full ciphertext + answer card for a type page."""
     label = TYPE_LABEL.get(p.get("type"), p.get("type", "?"))
     source = TYPE_SOURCE.get(p.get("type"), "")
+    source_url = TYPE_SOURCE_URL.get(p.get("type"), "")
+    source_html = (f'<a href="{esc(source_url)}" target="_blank" rel="noopener">{esc(source)}</a>'
+                   if source_url else esc(source))
     cipher = esc(p.get("ciphertext") or "")
     answer = esc(p.get("answer") or "")
     clue = esc(p.get("clue") or "")
@@ -142,12 +151,13 @@ def answer_card(p):
         <div class="card-body">
           <div class="d-flex align-items-center mb-3">
             <h2 class="h5 m-0 me-auto">{esc(label)}</h2>
-            <span class="badge text-bg-secondary">{esc(source)}</span>{clue_html}
+            <span class="badge text-bg-secondary">Source: {source_html}</span>{clue_html}
           </div>
           <p class="text-secondary small mb-1"><i class="bi bi-lock"></i> Encrypted</p>
           <p class="cipher-text mb-3">{cipher}</p>
           <p class="text-secondary small mb-1"><i class="bi bi-unlock"></i> Decoded by our solver</p>
-          <p class="answer-text mb-0">{answer}</p>
+          <p class="answer-text mb-3">{answer}</p>
+          <p class="text-secondary small mb-0">Puzzle source: {source_html}</p>
         </div>
       </div>"""
 

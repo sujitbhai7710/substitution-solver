@@ -26,7 +26,8 @@
     "ocr_conf_ok": true
    },
    "needs_review": false,
-   "status": "ok"
+   "status": "ok",
+   "ciphertext": "DWNHB GYFF ZI QFF, CY EQDNYHD GNDW QFF, QHO DPM DZ INHO DWY LZZO NH QFF."
   },
   {
    "type": "cryptoquip",
@@ -80,7 +81,8 @@
     "ocr_conf_ok": true
    },
    "needs_review": false,
-   "status": "ok"
+   "status": "ok",
+   "ciphertext": "V\u2019S JVGW PD XDVOP DTP PD XWDXJW PMW SVKVOW VO B CTHVEBJ JBOZTBZW PMBP PABOHEWOSH YDASH. V YBOP PD HXWBG PD PMWVA HDTJH."
   }
  ],
  "diagnostics": {
