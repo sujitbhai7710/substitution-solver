@@ -1,6 +1,6 @@
 {
  "date": "2026-09-25",
- "generated_at": "2026-09-25T02:43:52.104364+00:00",
+ "generated_at": "2026-09-25T05:13:07.153330+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -9,12 +9,12 @@
    "attribution": "Cryptoquote \u00a9 King Features Syndicate, via Arkansas Democrat-Gazette",
    "teaser": "DWNHB GYFF ZI QFF, CY EQDNYHD GNDW QFF, QHO DPM \u2026",
    "clue": "",
-   "ocr_conf": null,
+   "ocr_conf": 90.9,
    "answer": "THINK WELL OF ALL, BE PATIENT WITH ALL, AND TRY TO FIND THE GOOD IN ALL. \u2014 MUHAMMAD ALI",
    "solver": {
     "key": "JKBTPLWNFQUGYIDRAZXSVCHMEO",
     "score": -1532.418,
-    "ms": 1202.5,
+    "ms": 1255.2,
     "restarts": 192,
     "steps": 6000
    },
@@ -23,24 +23,24 @@
     "reencode_ok": true,
     "common_words_ok": true,
     "word_ratio_ok": true,
-    "ocr_conf_ok": false
+    "ocr_conf_ok": true
    },
-   "needs_review": true,
-   "status": "flagged"
+   "needs_review": false,
+   "status": "ok"
   },
   {
    "type": "cryptoquip",
    "date": "2026-09-25",
    "source": "cecildaily",
    "attribution": "Cryptoquip \u00a9 King Features Syndicate, via Cecil Daily",
-   "teaser": "ZV H FJIMJWB, Z MHD H AZAZF ZKKTMZLV LX H KZBBKJ\u2026",
-   "clue": "Z=I",
-   "ocr_conf": null,
-   "answer": "IN A DEYSERT, I SAW A VIVID ILLUSION OF A LITTLE GUY. IT WAS MY SON FLROMA PREVIOUS MIRAGE.",
+   "teaser": "ZH Y RZCYXCK TEXXLQW AYTK ELO FUZEU OE YGESJFELU\u2026",
+   "clue": "R=B",
+   "ocr_conf": 89.5,
+   "answer": "IF A BIVALVE MOLLUSK CAME OUT PRIOR TO ADOWNPOUR, I RECKO I WOULD BE THE CLAM BEFORE THE STORM. M ' V E P W , J",
    "solver": {
-    "key": "VTGWMDHAYELOSZPQXJCUBNRFKI",
-    "score": -1877.526,
-    "ms": 1092.9,
+    "key": "CXVQOPDFJNEUZGTHSBWMRYKLAI",
+    "score": -2822.041,
+    "ms": 1464.7,
     "restarts": 192,
     "steps": 6000
    },
@@ -48,8 +48,8 @@
     "clue_ok": true,
     "reencode_ok": true,
     "common_words_ok": true,
-    "word_ratio_ok": true,
-    "ocr_conf_ok": false
+    "word_ratio_ok": false,
+    "ocr_conf_ok": true
    },
    "needs_review": true,
    "status": "flagged"
@@ -66,7 +66,7 @@
    "solver": {
     "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
     "score": -1884.867,
-    "ms": 1652.7,
+    "ms": 1711.4,
     "restarts": 192,
     "steps": 6000
    },
@@ -92,7 +92,7 @@
    "solver": {
     "key": "RAMOCZKSJLVQHXNTFBDUYIEPWG",
     "score": -1951.419,
-    "ms": 1619.7,
+    "ms": 1657.3,
     "restarts": 192,
     "steps": 6000
    },
@@ -118,7 +118,7 @@
    "solver": {
     "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
     "score": -1885.961,
-    "ms": 1421.0,
+    "ms": 1468.1,
     "restarts": 192,
     "steps": 6000
    },
@@ -143,8 +143,8 @@
    "celebrity_cipher"
   ],
   "ocr_conf": {
-   "cryptoquote": null,
-   "cryptoquip": null,
+   "cryptoquote": 90.9,
+   "cryptoquip": 89.5,
    "celebrity_cipher": null
   }
  }
