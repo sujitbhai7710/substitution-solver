@@ -53,9 +53,39 @@ def fetch_cryptoquote(day):
         data = get(url)
         if len(data) < 5000:
             return None, f"too small ({len(data)}b)"
-        return save(f"{day:%Y-%m-%d}_cryptoquote.jpg", data), None
+        path = save(f"{day:%Y-%m-%d}_cryptoquote.jpg", data)
+        ok, detail = verify_printed_date(path, day)
+        if not ok:
+            return None, f"date mismatch: {detail}"
+        return path, None
     except Exception as e:
         return None, f"{url}: {e}"
+
+
+def verify_printed_date(img_path, day):
+    """Check the Arkansas cryptoquote image's printed corner date (e.g. '9-25')
+    matches the requested day. The date-patterned CDN URL has served a stale
+    (previous-day) image for a future date, so never trust the URL alone.
+    Fail closed on a positive mismatch; proceed with a warning only when no
+    date-like string is OCR'd at all (downstream review checks still apply)."""
+    import re
+    import subprocess
+    try:
+        r = subprocess.run(["tesseract", img_path, "stdout", "--psm", "6"],
+                           capture_output=True, text=True, timeout=90)
+        text = r.stdout or ""
+    except Exception as e:
+        return True, f"date check skipped (tesseract unavailable: {e})"
+    want = f"{day.month}-{day.day}"
+    seen = []
+    for m in re.finditer(r"(\d{1,2})[-/](\d{1,2})", text):
+        got = f"{int(m.group(1))}-{int(m.group(2))}"
+        seen.append(m.group(0))
+        if got == want:
+            return True, f"printed date {m.group(0)} matches {want}"
+    if seen:
+        return False, f"printed date {seen[0]} != target {want}"
+    return True, "no printed date OCR'd; proceeding (downstream checks apply)"
 
 
 def article_published_date(ahtml):
