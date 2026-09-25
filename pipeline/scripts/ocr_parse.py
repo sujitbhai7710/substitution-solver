@@ -24,13 +24,16 @@ import tempfile
 
 BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
+# Tesseract page-segmentation modes tried per asset. PSM 6 (uniform block)
+# is the default; 4 (single column) and 3 (fully automatic) often read
+# word spacing differently — e.g. "A DOWNPOUR" vs merged "ADOWNPOUR".
+# solve_all.py runs the solver on each variant and keeps the one whose
+# decode passes all review checks, so OCR is judged by its results.
+OCR_PSMS = ["6", "4", "3"]
 
-def ocr_image(path):
-    """Run tesseract on an image file; return (text, mean_conf).
 
-    Newspaper thumbnails (e.g. 304px wide) OCR badly; upscale small images
-    first so tesseract sees ~1200px-wide text.
-    """
+def _prep_image(path):
+    """Upscale small images; return (use_path, tmp_path_or_None)."""
     use_path, tmp_big = path, None
     try:
         from PIL import Image
@@ -44,8 +47,18 @@ def ocr_image(path):
             use_path = tmp_big
     except Exception:
         pass
+    return use_path, tmp_big
+
+
+def ocr_image(path):
+    """Run tesseract on an image file; return (text, mean_conf).
+
+    Newspaper thumbnails (e.g. 304px wide) OCR badly; upscale small images
+    first so tesseract sees ~1200px-wide text.
+    """
+    use_path, tmp_big = _prep_image(path)
     try:
-        return _tesseract(use_path)
+        return _tesseract(use_path, OCR_PSMS[0])
     finally:
         if tmp_big:
             try:
@@ -54,11 +67,34 @@ def ocr_image(path):
                 pass
 
 
-def _tesseract(path):
+def ocr_image_variants(path):
+    """OCR with each PSM in OCR_PSMS; return [(text, conf), ...] (best first).
+
+    Order: PSM 6 result first, then alternates. Callers parse every variant;
+    solve_all.py picks the variant whose decode passes review.
+    """
+    use_path, tmp_big = _prep_image(path)
+    variants = []
+    try:
+        for psm in OCR_PSMS:
+            try:
+                variants.append(_tesseract(use_path, psm))
+            except Exception:
+                continue
+    finally:
+        if tmp_big:
+            try:
+                os.unlink(tmp_big)
+            except OSError:
+                pass
+    return variants
+
+
+def _tesseract(path, psm):
     with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as tf:
         out_base = tf.name[:-4]
     try:
-        subprocess.run(["tesseract", path, out_base, "--psm", "6", "-l", "eng"],
+        subprocess.run(["tesseract", path, out_base, "--psm", psm, "-l", "eng"],
                        capture_output=True, timeout=300)
         with open(out_base + ".txt", encoding="utf-8", errors="replace") as f:
             text = f.read()
@@ -66,7 +102,7 @@ def _tesseract(path):
         conf = None
         tsv_debug = {}
         try:
-            r = subprocess.run(["tesseract", path, "stdout", "--psm", "6", "-l", "eng", "tsv"],
+            r = subprocess.run(["tesseract", path, "stdout", "--psm", psm, "-l", "eng", "tsv"],
                                capture_output=True, timeout=300, text=True)
             tsv_debug["rc"] = r.returncode
             tsv_debug["stdout_len"] = len(r.stdout or "")
@@ -131,6 +167,50 @@ def ocr_pdf(path):
                     confs.append(c)
         conf = round(sum(confs) / len(confs), 1) if confs else None
         return "\n".join(texts), conf, debugs
+    finally:
+        for fn in os.listdir(tmp):
+            os.unlink(os.path.join(tmp, fn))
+        os.rmdir(tmp)
+
+
+def ocr_pdf_variants(path):
+    """Render PDF pages, OCR each page with every PSM; return [(text, conf)].
+
+    Variant i combines page texts from PSM OCR_PSMS[i] (page-major order).
+    """
+    tmp = tempfile.mkdtemp(prefix="cqpdf_")
+    try:
+        subprocess.run(["pdftoppm", "-png", "-r", "200", path, os.path.join(tmp, "p")],
+                       capture_output=True, timeout=300, check=True)
+        pages = sorted(f for f in os.listdir(tmp) if f.endswith(".png"))
+        # run per-PSM explicitly to keep text/conf aligned
+        per_psm, confs = {psm: [] for psm in OCR_PSMS}, {psm: [] for psm in OCR_PSMS}
+        for fn in pages:
+            use_path, tmp_big = _prep_image(os.path.join(tmp, fn))
+            try:
+                for psm in OCR_PSMS:
+                    try:
+                        t, c, _ = _tesseract(use_path, psm)
+                    except Exception:
+                        t, c = "", None
+                    per_psm[psm].append(t)
+                    if c is not None:
+                        confs[psm].append(c)
+            finally:
+                if tmp_big:
+                    try:
+                        os.unlink(tmp_big)
+                    except OSError:
+                        pass
+        variants = []
+        for psm in OCR_PSMS:
+            texts = per_psm[psm]
+            if not any(texts):
+                continue
+            cc = confs[psm]
+            variants.append(("\n".join(texts),
+                             round(sum(cc) / len(cc), 1) if cc else None))
+        return variants
     finally:
         for fn in os.listdir(tmp):
             os.unlink(os.path.join(tmp, fn))
@@ -270,6 +350,19 @@ def parse_cryptoquip_ocr(text):
     return norm_ws(cipher)
 
 
+def pick_primary(ciphers):
+    """Pick the most plausible cipher parse (most words, then most letters).
+
+    Merged-word OCR errors ("ADOWNPOUR") lose a word boundary, so the
+    correctly spaced variant scores higher. The solver makes the final call
+    in solve_all.py; this only chooses the display default.
+    """
+    ciphers = [c for c in ciphers if c and len(re.sub(r"[^A-Za-z]", "", c)) >= 20]
+    if not ciphers:
+        return ""
+    return max(ciphers, key=lambda c: (len(c.split()), sum(x.isalpha() for x in c)))
+
+
 def main():
     with open(sys.argv[1]) as f:
         man = json.load(f)
@@ -279,26 +372,35 @@ def main():
     img = man.get("cryptoquote_img")
     if img and os.path.exists(os.path.join(BASE, img) if not os.path.isabs(img) else img):
         p = img if os.path.isabs(img) else os.path.join(BASE, img)
-        text, conf, dbg = ocr_image(p)
-        cipher, yesterday, pdate = parse_cryptoquote_ocr(text)
-        puzzles.append({"type": "cryptoquote", "date": day, "ciphertext": cipher,
+        variants = ocr_image_variants(p)
+        parses = [parse_cryptoquote_ocr(t) for t, _ in variants]
+        ciphers = [c for c, _, _ in parses]
+        cipher, yesterday, pdate = parses[0] if parses else ("", None, None)
+        # yesterday/printed-date from the primary (PSM 6) parse
+        conf = variants[0][1] if variants else None
+        puzzles.append({"type": "cryptoquote", "date": day, "ciphertext": pick_primary(ciphers) or cipher,
+                        "cipher_variants": [c for c in ciphers if c],
                         "clue": "", "source": "arkansasonline",
                         "asset": img, "ocr_conf": conf,
                         "printed_date": pdate,
                         "yesterday_answer": yesterday,
-                        "ocr_text": text[:2000],
-                        "ocr_debug": dbg})
+                        "ocr_text": (variants[0][0] if variants else "")[:2000]})
 
     pdf = man.get("cryptoquip_pdf")
     if pdf and os.path.exists(pdf if os.path.isabs(pdf) else os.path.join(BASE, pdf)):
         p = pdf if os.path.isabs(pdf) else os.path.join(BASE, pdf)
-        text, conf, dbgs = ocr_pdf(p)
-        cipher = parse_cryptoquip_ocr(text)
-        puzzles.append({"type": "cryptoquip", "date": day, "ciphertext": cipher,
-                        "clue": extract_clue(text), "source": "cecildaily",
+        variants = ocr_pdf_variants(p)
+        texts = [t for t, _ in variants]
+        ciphers = [parse_cryptoquip_ocr(t) for t in texts]
+        clues = [extract_clue(t) for t in texts]
+        conf = variants[0][1] if variants else None
+        # clue from the primary parse (first non-empty)
+        clue = next((c for c in clues if c), "")
+        puzzles.append({"type": "cryptoquip", "date": day, "ciphertext": pick_primary(ciphers),
+                        "cipher_variants": [c for c in ciphers if c],
+                        "clue": clue, "source": "cecildaily",
                         "asset": pdf, "ocr_conf": conf,
-                        "ocr_text": text[:2000],
-                        "ocr_debug": dbgs})
+                        "ocr_text": (texts[0] if texts else "")[:2000]})
 
     for c in man.get("celeb_ciphers", []):
         puzzles.append({"type": "celebrity_cipher", "date": c["date"],

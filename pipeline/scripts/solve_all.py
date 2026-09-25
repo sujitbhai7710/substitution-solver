@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 """solve_all.py — solve each puzzle with the Rust solver, run review checks,
-write results/<date>.json with teaser + answer (never the full ciphertext).
+write results/<date>.json with full ciphertext + teaser + answer.
 
 Usage: solve_all.py <puzzles.json> [--solver /path/to/solve_one]
+
+For OCR'd puzzles, puzzles.json may carry cipher_variants (one parse per
+tesseract PSM). Each variant is solved; the first whose decode passes all
+review checks wins. Fallback: the variant with the most checks passing.
+
+Results files MERGE: a run covering only some types replaces those types'
+entries and keeps the others, so three per-type scheduled runs share one
+daily file without clobbering each other.
 
 Review checks (no external LLM needed):
   - clue_ok:        the given clue mapping holds in the solved key
@@ -107,6 +115,73 @@ def teaser(ciphertext, n=48):
     return (t[:n] + "…") if len(t) > n else t
 
 
+def solve_puzzle(solver, p):
+    """Solve one puzzle, trying each OCR variant; return (entry, winning_ct).
+
+    The first variant whose decode passes every review check wins; otherwise
+    the variant with the most checks passing is kept (flagged).
+    """
+    variants = p.get("cipher_variants") or [p.get("ciphertext", "")]
+    # de-dupe, drop empties, keep order
+    seen, cts = set(), []
+    for ct in variants:
+        ct = (ct or "").strip()
+        if ct and ct not in seen and len(re.sub(r"[^A-Za-z]", "", ct)) >= 20:
+            seen.add(ct)
+            cts.append(ct)
+    entry = {"type": p["type"], "date": p["date"], "source": p["source"],
+             "attribution": p.get("attribution") or SOURCE_ATTR.get(p["type"], p["source"]),
+             "clue": p.get("clue", ""), "ocr_conf": p.get("ocr_conf")}
+    if not cts:
+        entry.update({"status": "no_ciphertext", "needs_review": True,
+                      "ciphertext": "", "teaser": ""})
+        return entry, ""
+    best = None  # (n_checks_ok, all_ok, ct, sol, checks)
+    for ct in cts:
+        try:
+            sol = run_solver(solver, ct, p.get("clue", ""))
+        except Exception as e:
+            cand = (0, False, ct, None,
+                    {"solver_error": str(e)[:120]})
+            if best is None or cand[0] > best[0]:
+                best = cand
+            continue
+        checks = {
+            "clue_ok": check_clue(p.get("clue", ""), sol.get("key", "")),
+            "reencode_ok": check_reencode(ct, sol.get("plaintext", ""), sol.get("key", "")),
+            "common_words_ok": check_common_words(sol.get("plaintext", "")),
+            "word_ratio_ok": check_word_ratio(sol.get("plaintext", "")),
+            # puzzles with no OCR step (text sources) pass ocr_conf vacuously
+            "ocr_conf_ok": check_ocr_conf(p.get("ocr_conf")) if p.get("asset") else True,
+        }
+        n_ok = sum(1 for v in checks.values() if v)
+        cand = (n_ok, all(checks.values()), ct, sol, checks)
+        if best is None or (cand[1] and not best[1]) or \
+           (cand[1] == best[1] and cand[0] > best[0]):
+            best = cand
+        if cand[1]:
+            break  # first fully-clean variant wins
+    _, all_ok, ct, sol, checks = best
+    entry["ciphertext"] = ct
+    entry["teaser"] = teaser(ct)
+    if sol is None:
+        entry.update({"status": checks.get("solver_error", "solver_error"),
+                      "needs_review": True, "checks": {}})
+        return entry, ct
+    entry.update({
+        "answer": sol["plaintext"],
+        "solver": {"key": sol.get("key"), "score": sol.get("score"),
+                   "ms": sol.get("ms"), "restarts": 192, "steps": 6000},
+        "checks": checks,
+        "needs_review": not all_ok,
+        "status": "ok" if all_ok else "flagged",
+    })
+    return entry, ct
+
+
+TYPE_ORDER = ["cryptoquote", "cryptoquip", "celebrity_cipher"]
+
+
 def main():
     puzzles_path = sys.argv[1]
     solver = None
@@ -121,56 +196,37 @@ def main():
     day = data["date"]
     results = []
     for p in data["puzzles"]:
-        entry = {"type": p["type"], "date": p["date"], "source": p["source"],
-                 "attribution": SOURCE_ATTR.get(p["type"], p["source"]),
-                 "teaser": teaser(p["ciphertext"]), "clue": p.get("clue", ""),
-                 "ocr_conf": p.get("ocr_conf")}
-        ct = p["ciphertext"]
-        if not ct or len(re.sub(r"[^A-Za-z]", "", ct)) < 20:
-            entry["status"] = "no_ciphertext"
-            entry["needs_review"] = True
-            results.append(entry)
-            continue
-        try:
-            sol = run_solver(solver, ct, p.get("clue", ""))
-        except Exception as e:
-            entry["status"] = f"solver_error: {e}"
-            entry["needs_review"] = True
-            results.append(entry)
-            continue
-        checks = {
-            "clue_ok": check_clue(p.get("clue", ""), sol.get("key", "")),
-            "reencode_ok": check_reencode(ct, sol.get("plaintext", ""), sol.get("key", "")),
-            "common_words_ok": check_common_words(sol.get("plaintext", "")),
-            "word_ratio_ok": check_word_ratio(sol.get("plaintext", "")),
-            # puzzles with no OCR step (text sources) pass ocr_conf vacuously
-            "ocr_conf_ok": check_ocr_conf(p.get("ocr_conf")) if p.get("asset") else True,
-        }
-        entry.update({
-            "answer": sol["plaintext"],
-            "solver": {"key": sol.get("key"), "score": sol.get("score"),
-                       "ms": sol.get("ms"), "restarts": 192, "steps": 6000},
-            "checks": checks,
-            "needs_review": not all(checks.values()),
-            "status": "ok" if all(checks.values()) else "flagged",
-        })
-        # never republish the full ciphertext: keep only the teaser
+        entry, _ = solve_puzzle(solver, p)
         results.append(entry)
+
+    op = os.path.join(BASE, "results", f"{day}.json")
+    # MERGE with any existing entries (per-type scheduled runs share the file)
+    merged = {}
+    if os.path.exists(op):
+        try:
+            prev = json.load(open(op))
+            for r in prev.get("puzzles", []):
+                merged[r["type"]] = r
+        except Exception:
+            pass
+    for r in results:
+        merged[r["type"]] = r
+    puzzles = [merged[t] for t in TYPE_ORDER if t in merged] + \
+              [r for t, r in merged.items() if t not in TYPE_ORDER]
 
     out = {"date": day,
            "generated_at": datetime.now(timezone.utc).isoformat(),
-           "puzzles": results,
+           "puzzles": puzzles,
            "diagnostics": {
                "fetch_errors": data.get("fetch_errors", {}),
-               "puzzle_types": [r["type"] for r in results],
-               "ocr_conf": {r["type"]: r.get("ocr_conf") for r in results},
+               "puzzle_types": [r["type"] for r in puzzles],
+               "ocr_conf": {r["type"]: r.get("ocr_conf") for r in puzzles},
            }}
     os.makedirs(os.path.join(BASE, "results"), exist_ok=True)
-    op = os.path.join(BASE, "results", f"{day}.json")
     with open(op, "w") as f:
         json.dump(out, f, indent=1)
-    n_ok = sum(1 for r in results if r.get("status") == "ok")
-    print(f"wrote {op}: {n_ok}/{len(results)} ok")
+    n_ok = sum(1 for r in puzzles if r.get("status") == "ok")
+    print(f"wrote {op}: {n_ok}/{len(puzzles)} ok (this run: {len(results)} types)")
     print(json.dumps(out, indent=1)[:3000])
 
 

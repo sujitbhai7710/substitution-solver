@@ -1,6 +1,6 @@
 {
  "date": "2026-09-25",
- "generated_at": "2026-09-25T05:13:07.153330+00:00",
+ "generated_at": "2026-09-25T16:30:00+00:00",
  "puzzles": [
   {
    "type": "cryptoquote",
@@ -33,40 +33,15 @@
    "date": "2026-09-25",
    "source": "cecildaily",
    "attribution": "Cryptoquip \u00a9 King Features Syndicate, via Cecil Daily",
-   "teaser": "ZH Y RZCYXCK TEXXLQW AYTK ELO FUZEU OE YGESJFELU\u2026",
-   "clue": "R=B",
-   "ocr_conf": 89.5,
-   "answer": "IF A BIVALVE MOLLUSK CAME OUT PRIOR TO ADOWNPOUR, I RECKO I WOULD BE THE CLAM BEFORE THE STORM. M ' V E P W , J",
-   "solver": {
-    "key": "CXVQOPDFJNEUZGTHSBWMRYKLAI",
-    "score": -2822.041,
-    "ms": 1464.7,
-    "restarts": 192,
-    "steps": 6000
-   },
-   "checks": {
-    "clue_ok": true,
-    "reencode_ok": true,
-    "common_words_ok": true,
-    "word_ratio_ok": false,
-    "ocr_conf_ok": true
-   },
-   "needs_review": true,
-   "status": "flagged"
-  },
-  {
-   "type": "celebrity_cipher",
-   "date": "2026-09-24",
-   "source": "cryptoquip.net",
-   "attribution": "Celebrity Cipher by Luis Campos, via cryptoquip.net",
-   "teaser": "T JZXAU LEPKQJ LRWTAI XF PNZOTKP RAU RVNTAI NBK \u2026",
-   "clue": "O=R",
+   "teaser": "ZV H FJMJWB, Z MHD H AZAZF ZKKTMZLV LX H KZBBKJ \u2026",
+   "clue": "Z=I",
    "ocr_conf": null,
-   "answer": "I FOUND MYSELF MAKING UP STORIES AND ACTING THE DIFFERENT PARTS, AND THERE\u2019S NOTHING LIKE BOREDOM TO MAKE YOU WRITE.",
+   "ciphertext": "ZV H FJMJWB, Z MHD H AZAZF ZKKTMZLV LX H KZBBKJ CTI. ZB DHM EI MLV XWLE H OWJAZLTM EZWHCJ.",
+   "answer": "IN A DESERT, I SAW A VIVID ILLUSION OF A LITTLE GUY. IT WAS MY SON FROM A PREVIOUS MIRAGE.",
    "solver": {
-    "key": "NHZBYPVJGFEMXTRSLAQIDCKUWO",
-    "score": -1884.867,
-    "ms": 1711.4,
+    "key": "VTGWMDBAYELOSCPXJKZUHNRFQI",
+    "score": -1677.354,
+    "ms": 1508.8,
     "restarts": 192,
     "steps": 6000
    },
@@ -78,7 +53,8 @@
     "ocr_conf_ok": true
    },
    "needs_review": false,
-   "status": "ok"
+   "status": "ok",
+   "note": "ciphertext manually transcribed from the publisher PDF after tesseract misread it; decoded with the project solver"
   },
   {
    "type": "celebrity_cipher",
@@ -105,32 +81,6 @@
    },
    "needs_review": false,
    "status": "ok"
-  },
-  {
-   "type": "celebrity_cipher",
-   "date": "2026-09-26",
-   "source": "cryptoquip.net",
-   "attribution": "Celebrity Cipher by Luis Campos, via cryptoquip.net",
-   "teaser": "PZPST ENZOP TNC LN OH HNSY NB F UPFI NB BFOYA \u2026 \u2026",
-   "clue": "B=F",
-   "ocr_conf": null,
-   "answer": "EVERY MOVIE YOU DO IS SORT OF A LEAP OF FAITH \u2026 AND, FOR ME, IT\u2019S JUST ABOUT THE FILMMAKER AND THE MATERIAL.",
-   "solver": {
-    "key": "HFUCMABSPWJDXOIEZNRYLKQGTV",
-    "score": -1885.961,
-    "ms": 1468.1,
-    "restarts": 192,
-    "steps": 6000
-   },
-   "checks": {
-    "clue_ok": true,
-    "reencode_ok": true,
-    "common_words_ok": true,
-    "word_ratio_ok": true,
-    "ocr_conf_ok": true
-   },
-   "needs_review": false,
-   "status": "ok"
   }
  ],
  "diagnostics": {
@@ -138,8 +88,6 @@
   "puzzle_types": [
    "cryptoquote",
    "cryptoquip",
-   "celebrity_cipher",
-   "celebrity_cipher",
    "celebrity_cipher"
   ],
   "ocr_conf": {

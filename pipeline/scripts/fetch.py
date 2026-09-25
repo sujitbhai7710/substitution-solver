@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """fetch.py — download the day's raw puzzle assets.
 
+Usage: fetch.py [YYYY-MM-DD] [--types=cryptoquote,cryptoquip,celebrity_cipher]
+
 Outputs a JSON manifest to stdout:
 {
   "date": "2026-09-24",
   "cryptoquote_img": "assets/2026-09-24_cryptoquote.jpg | null",
   "cryptoquip_pdf":  "assets/2026-09-24_cryptoquip.pdf | null",
   "celeb_ciphers": [ {"date": "2026-09-24", "ciphertext": "...", "clue": "O=R",
-                       "attribution": "AGATHA CHRISTIE"}, ... ]   # today + upcoming from week page
+                      "attribution": "AGATHA CHRISTIE"} ]   # target day only (1/day)
 }
 
 Sources:
@@ -15,7 +17,7 @@ Sources:
     https://cdn.wehco.com/adg/puzzles/{MMDD}/quote.jpg
 - Cryptoquip: Cecil Daily section page -> latest article -> PDF link
     https://www.cecildaily.com/diversions/cryptoquip/
-- Celebrity Cipher: cryptoquip.net week page (today + upcoming days)
+- Celebrity Cipher: cryptoquip.net week page (target day only, 1/day)
     https://cryptoquip.net/todays-celebrity-cipher-answer/
 """
 import json
@@ -153,8 +155,12 @@ def fetch_cryptoquip(day):
     return None, f"no PDF in first {min(6, len(arts))} articles (no parseable dates)", {}
 
 
-def fetch_celebrity_ciphers():
-    """cryptoquip.net week page: per-date ciphertext + clue (+ attribution)."""
+def fetch_celebrity_ciphers(day):
+    """cryptoquip.net week page: per-date ciphertext + clue (+ attribution).
+
+    Returns ONLY the cipher for the target day (1/day) — the caller, not the
+    parser, decides which date is wanted.
+    """
     try:
         html = get("https://cryptoquip.net/todays-celebrity-cipher-answer/").decode("utf-8", "replace")
     except Exception as e:
@@ -201,31 +207,46 @@ def fetch_celebrity_ciphers():
         if c["date"] not in seen:
             seen.add(c["date"])
             uniq.append(c)
-    return uniq, None
+    # 1/day: keep only the target date's cipher
+    want = day.strftime("%Y-%m-%d")
+    day_only = [c for c in uniq if c["date"] == want]
+    if not day_only:
+        return [], f"no celebrity cipher for {want} on week page (saw: {[c['date'] for c in uniq][:5]})"
+    return day_only, None
 
 
 def main():
     day = datetime.now()
-    if len(sys.argv) > 1:
-        day = datetime.strptime(sys.argv[1], "%Y-%m-%d")
-    manifest = {"date": day.strftime("%Y-%m-%d"), "errors": {}}
+    types = {"cryptoquote", "cryptoquip", "celebrity_cipher"}
+    args = []
+    for a in sys.argv[1:]:
+        if a.startswith("--types="):
+            types = set(a.split("=", 1)[1].split(","))
+        else:
+            args.append(a)
+    if args:
+        day = datetime.strptime(args[0], "%Y-%m-%d")
+    manifest = {"date": day.strftime("%Y-%m-%d"), "errors": {}, "types": sorted(types)}
 
-    img, err = fetch_cryptoquote(day)
-    manifest["cryptoquote_img"] = img
-    if err:
-        manifest["errors"]["cryptoquote"] = err
+    if "cryptoquote" in types:
+        img, err = fetch_cryptoquote(day)
+        manifest["cryptoquote_img"] = img
+        if err:
+            manifest["errors"]["cryptoquote"] = err
 
-    pdf, err, info = fetch_cryptoquip(day)
-    manifest["cryptoquip_pdf"] = pdf
-    manifest["cryptoquip_article"] = info.get("article")
-    manifest["cryptoquip_article_date"] = info.get("article_date")
-    if err:
-        manifest["errors"]["cryptoquip"] = err
+    if "cryptoquip" in types:
+        pdf, err, info = fetch_cryptoquip(day)
+        manifest["cryptoquip_pdf"] = pdf
+        manifest["cryptoquip_article"] = info.get("article")
+        manifest["cryptoquip_article_date"] = info.get("article_date")
+        if err:
+            manifest["errors"]["cryptoquip"] = err
 
-    ciphers, err = fetch_celebrity_ciphers()
-    manifest["celeb_ciphers"] = ciphers
-    if err:
-        manifest["errors"]["celebrity_cipher"] = err
+    if "celebrity_cipher" in types:
+        ciphers, err = fetch_celebrity_ciphers(day)
+        manifest["celeb_ciphers"] = ciphers
+        if err:
+            manifest["errors"]["celebrity_cipher"] = err
 
     print(json.dumps(manifest, indent=1))
 

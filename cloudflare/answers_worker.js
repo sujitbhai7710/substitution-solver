@@ -28,13 +28,14 @@ async function ingestDay(env, day) {
       const clean = (p.status || "ok") === "ok" && !p.needs_review && p.answer;
       if (!clean) { refused++; continue; }
       kept++; await env.DB.prepare(
-        `INSERT INTO answers (day, type, source, teaser, clue, answer, attribution,
-          solver_key, solver_score, solver_ms, ocr_conf, checks_json, needs_review,
-          status, generated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `INSERT INTO answers (day, type, source, teaser, clue, ciphertext, answer,
+          attribution, solver_key, solver_score, solver_ms, ocr_conf, checks_json,
+          needs_review, status, generated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(day, type) DO UPDATE SET
           source=excluded.source, teaser=excluded.teaser, clue=excluded.clue,
-          answer=excluded.answer, attribution=excluded.attribution,
+          ciphertext=excluded.ciphertext, answer=excluded.answer,
+          attribution=excluded.attribution,
           solver_key=excluded.solver_key, solver_score=excluded.solver_score,
           solver_ms=excluded.solver_ms, ocr_conf=excluded.ocr_conf,
           checks_json=excluded.checks_json, needs_review=excluded.needs_review,
@@ -42,7 +43,7 @@ async function ingestDay(env, day) {
           ingested_at=datetime('now')`
       ).bind(
         p.date || day, p.type, p.source, p.teaser || null, p.clue || null,
-        p.answer || null, p.attribution || null,
+        p.ciphertext || null, p.answer || null, p.attribution || null,
         (p.solver && p.solver.key) || null, (p.solver && p.solver.score) || null,
         (p.solver && p.solver.ms) || null, p.ocr_conf ?? null,
         p.checks ? JSON.stringify(p.checks) : null,
@@ -76,9 +77,15 @@ export default {
     if (url.pathname === "/answers") {
       const day = url.searchParams.get("date");
       if (!day) return json({ error: "date required (YYYY-MM-DD)" }, 400);
-      const rows = await env.DB.prepare(
-        "SELECT day, type, source, teaser, clue, answer, attribution, ocr_conf, needs_review, status FROM answers WHERE day = ?"
-      ).bind(day).all();
+      const type = url.searchParams.get("type");
+      const cols = "day, type, source, teaser, clue, ciphertext, answer, attribution, ocr_conf, needs_review, status";
+      const rows = type
+        ? await env.DB.prepare(
+            `SELECT ${cols} FROM answers WHERE day = ? AND type = ?`
+          ).bind(day, type).all()
+        : await env.DB.prepare(
+            `SELECT ${cols} FROM answers WHERE day = ?`
+          ).bind(day).all();
       return json({ date: day, puzzles: rows.results });
     }
     if (url.pathname === "/answers/latest") {
@@ -86,9 +93,15 @@ export default {
         "SELECT day FROM answers ORDER BY day DESC LIMIT 1"
       ).first();
       if (!d) return json({ error: "no answers yet" }, 404);
-      const rows = await env.DB.prepare(
-        "SELECT day, type, source, teaser, clue, answer, attribution, ocr_conf, needs_review, status FROM answers WHERE day = ?"
-      ).bind(d.day).all();
+      const type = url.searchParams.get("type");
+      const cols = "day, type, source, teaser, clue, ciphertext, answer, attribution, ocr_conf, needs_review, status";
+      const rows = type
+        ? await env.DB.prepare(
+            `SELECT ${cols} FROM answers WHERE day = ? AND type = ?`
+          ).bind(d.day, type).all()
+        : await env.DB.prepare(
+            `SELECT ${cols} FROM answers WHERE day = ?`
+          ).bind(d.day).all();
       return json({ date: d.day, puzzles: rows.results });
     }
     if (url.pathname === "/ingest") {
@@ -99,7 +112,9 @@ export default {
     return new Response("puzzle-answers ok");
   },
   async scheduled(event, env, ctx) {
-    // Runs daily after the GitHub Action: ingest today (+ yesterday as catch-up).
+    // Runs on three daily crons (one per puzzle type, timed just after each
+    // publisher's update window): ingest today (+ yesterday as catch-up).
+    // Ingest is idempotent — reruns just refresh the same rows.
     ctx.waitUntil((async () => {
       const today = new Date().toISOString().slice(0, 10);
       const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);

@@ -1,0 +1,93 @@
+name: daily-cryptoquip
+
+# Cecil Daily posts the cryptoquip article overnight US Central; scrape at
+# 12:00 UTC and retry every 20 min for up to 3h if it isn't up yet.
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  solve-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OCR deps
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr poppler-utils
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rebuild -> target
+
+      - name: Build solver
+        run: cargo build --release --bin solve_one --manifest-path rebuild/Cargo.toml
+
+      - name: Fetch (retry until published)
+        run: |
+          pip install --quiet beautifulsoup4 pillow 2>/dev/null || true
+          ok=0
+          for i in $(seq 1 9); do
+            python3 pipeline/scripts/fetch.py --types=cryptoquip > /tmp/manifest.json
+            if python3 -c "
+          import json,sys
+          m = json.load(open('/tmp/manifest.json'))
+          sys.exit(0 if m.get('cryptoquip_pdf') and not m.get('errors', {}).get('cryptoquip') else 1)
+          "; then ok=1; echo "cryptoquip published"; break; fi
+            echo "not yet published (attempt $i/9), waiting 20m"
+            sleep 1200
+          done
+          [ $ok -eq 1 ] || { echo "cryptoquip never appeared"; cat /tmp/manifest.json; exit 1; }
+
+      - name: OCR + parse
+        run: python3 pipeline/scripts/ocr_parse.py /tmp/manifest.json > /tmp/puzzles.json
+
+      - name: Solve + review + publish
+        run: >
+          python3 pipeline/scripts/solve_all.py /tmp/puzzles.json
+          --solver rebuild/target/release/solve_one
+
+      - name: Commit results
+        run: |
+          git config user.name "puzzle-bot"
+          git config user.email "puzzle-bot@users.noreply.github.com"
+          git add pipeline/results/ || true
+          git diff --cached --quiet || git commit -m "cryptoquip $(date -u +%F)"
+          git push
+
+      - name: Render static answers pages
+        run: |
+          DAY=$(date -u +%F)
+          if [ -f pipeline/results/$DAY.json ]; then
+            python3 pipeline/scripts/render_answers_page.py pipeline/results/$DAY.json current-site/
+            git config user.name "puzzle-bot"
+            git config user.email "puzzle-bot@users.noreply.github.com"
+            git add current-site/answers/ || true
+            git diff --cached --quiet || git commit -m "answers pages $DAY (cryptoquip)" && git push || true
+          else
+            echo "no results for $DAY, skipping page render"
+          fi
+
+      - name: Deploy site to Cloudflare Pages
+        if: success()
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          command: pages deploy current-site --project-name=substitution-cipher --commit-dirty=true
+
+      - name: Upload pipeline debug files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-debug-cryptoquip-${{ github.run_id }}
+          path: |
+            /tmp/manifest.json
+            /tmp/puzzles.json
+          retention-days: 7
