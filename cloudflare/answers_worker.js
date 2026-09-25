@@ -13,15 +13,21 @@
 async function ingestDay(env, day) {
   const owner = env.GITHUB_OWNER, repo = env.GITHUB_REPO;
   if (!owner || !repo) throw new Error("GITHUB_OWNER/GITHUB_REPO not set");
-  const url = `https://raw.githubusercontent.com/${owner}/${repo}/main/pipeline/results/${day}.json`;
+  const url = `https://raw.githubusercontent.com/${owner}/${repo}/master/pipeline/results/${day}.json`;
   const started = new Date().toISOString();
   let status = "ok", log = "";
   try {
     const res = await fetch(url, { headers: { "User-Agent": "puzzle-answers-worker" } });
     if (!res.ok) throw new Error(`github raw ${res.status} for ${day}`);
     const data = await res.json();
+    // Refuse anything that isn't a clean, reviewed answer: flagged entries,
+    // needs_review entries, and malformed entries (missing answer) never
+    // reach D1. This keeps bad OCR output out of the public API.
+    let kept = 0, refused = 0;
     for (const p of data.puzzles || []) {
-      await env.DB.prepare(
+      const clean = (p.status || "ok") === "ok" && !p.needs_review && p.answer;
+      if (!clean) { refused++; continue; }
+      kept++; await env.DB.prepare(
         `INSERT INTO answers (day, type, source, teaser, clue, answer, attribution,
           solver_key, solver_score, solver_ms, ocr_conf, checks_json, needs_review,
           status, generated_at)
@@ -43,7 +49,7 @@ async function ingestDay(env, day) {
         p.needs_review ? 1 : 0, p.status || "ok", data.generated_at || null
       ).run();
     }
-    log = `ingested ${(data.puzzles || []).length} puzzles`;
+    log = `ingested ${kept} puzzles, refused ${refused}`;
   } catch (e) {
     status = "failed";
     log = String((e && e.message) || e).slice(0, 500);
